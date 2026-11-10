@@ -1,0 +1,1162 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>ComLife</title>
+<meta name="theme-color" content="#07070d">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;800&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+@property --p{syntax:'<number>';inherits:false;initial-value:80}
+:root{
+  --bg:#07070d; --bg2:#0d0e1a; --glass:rgba(18,20,38,.78); --glass2:rgba(32,35,62,.85);
+  --fg:#eef0ff; --muted:#8f93b8; --line:rgba(140,150,255,.17);
+  --accent:#7c6cff; --accent2:#22d3ee; --pink:#ff4fa3;
+  --good:#34d399; --bad:#fb5a6e; --heat:#ff7a45; --gold:#fbbf24;
+  --f-display:'Bricolage Grotesque','Trebuchet MS',system-ui,sans-serif;
+  --f-body:'Inter',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --f-mono:'JetBrains Mono',ui-monospace,Menlo,Consolas,monospace;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+[hidden]{display:none!important}
+html,body{height:100%;margin:0}
+body{
+  background:radial-gradient(1100px 600px at 15% -10%,#1d1658 0%,transparent 60%),radial-gradient(900px 500px at 105% 110%,#0b3d4d 0%,transparent 55%),var(--bg);
+  color:var(--fg);font-family:var(--f-body);font-size:15px;line-height:1.45;overflow:hidden;color-scheme:dark;
+}
+button{font:inherit;color:inherit;cursor:pointer;border:0;background:none}
+button:focus-visible{outline:2px solid var(--accent2);outline-offset:2px}
+#bg{position:fixed;inset:0;z-index:0;width:100%;height:100%}
+#vig{position:fixed;inset:0;z-index:1;pointer-events:none;opacity:0;transition:opacity .8s;box-shadow:inset 0 0 140px 30px rgba(255,60,50,.55)}
+#vig.pulse{animation:vig 1.4s ease-in-out infinite}
+@keyframes vig{50%{filter:brightness(1.6)}}
+#flash{position:fixed;inset:0;pointer-events:none;opacity:0;z-index:80}
+#flash.go{animation:flash .55s ease-out}
+@keyframes flash{0%{opacity:.45}100%{opacity:0}}
+#confetti{position:fixed;inset:0;pointer-events:none;z-index:90}
+
+#app{position:relative;z-index:2;height:100vh;height:100dvh;max-width:640px;margin:0 auto;display:flex;flex-direction:column;
+  background:linear-gradient(180deg,rgba(12,13,26,.80),rgba(8,9,18,.90));backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+  border-inline:1px solid var(--line);box-shadow:0 0 90px rgba(124,108,255,.16);transition:filter .8s}
+body.jail #app{filter:grayscale(.65) contrast(1.05)}
+body.shake #app{animation:shake .45s}
+@keyframes shake{10%,90%{transform:translateX(-2px)}20%,80%{transform:translateX(4px)}30%,50%,70%{transform:translateX(-7px)}40%,60%{transform:translateX(7px)}}
+
+.top{display:flex;align-items:center;gap:8px;padding:10px 14px 4px;padding-top:max(10px,env(safe-area-inset-top))}
+.brand{font-family:var(--f-display);font-weight:800;font-size:24px;letter-spacing:-.02em;line-height:1;margin-right:auto}
+.brand b{background:linear-gradient(90deg,var(--accent),var(--accent2));-webkit-background-clip:text;background-clip:text;color:transparent}
+.brand small{font-family:var(--f-mono);font-weight:500;font-size:10px;color:var(--muted);margin-left:7px;letter-spacing:.08em}
+.ib{width:34px;height:34px;border-radius:10px;border:1px solid var(--line);background:var(--glass);display:grid;place-items:center;font-size:16px;transition:transform .15s,border-color .15s}
+.ib:hover{border-color:var(--accent);transform:translateY(-1px)}
+.ib.wide{width:auto;padding:0 10px;font-family:var(--f-mono);font-size:11px;color:var(--muted)}
+
+.hero{padding:8px 14px 12px;border-bottom:1px solid var(--line);background:linear-gradient(180deg,rgba(124,108,255,.08),transparent)}
+.hrow{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+.ava{--p:80;--ringc:var(--good);width:62px;height:62px;border-radius:50%;padding:3px;position:relative;flex:none;
+  background:conic-gradient(var(--ringc) calc(var(--p)*1%),rgba(255,255,255,.10) 0);transition:--p .6s}
+.ava .in{width:100%;height:100%;border-radius:50%;background:linear-gradient(160deg,#2c2e58,#16172f);display:grid;place-items:center;font-size:30px}
+.ava .bd{position:absolute;right:-5px;bottom:-5px;width:25px;height:25px;border-radius:50%;background:var(--bg2);border:1px solid var(--line);display:grid;place-items:center;font-size:14px}
+.ava.bump{animation:bump .5s}
+@keyframes bump{40%{transform:scale(1.14)}}
+.nameb{min-width:0}
+.nameb h1{margin:0;font-family:var(--f-display);font-weight:800;font-size:21px;line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sub{display:flex;flex-wrap:wrap;gap:5px;margin-top:5px}
+.tag{font-family:var(--f-mono);font-size:10.5px;padding:2px 8px;border-radius:999px;background:rgba(255,255,255,.07);color:var(--muted);white-space:nowrap}
+.tag.age{color:var(--fg);background:rgba(124,108,255,.25)}
+.tag.jail{background:var(--bad);color:#fff}
+.tag.love{color:#ffb3d6;background:rgba(255,79,163,.16)}
+.tag.com{color:var(--accent2);background:rgba(34,211,238,.13)}
+.tag.rec{color:var(--heat);background:rgba(255,122,69,.14)}
+.cashb{margin-left:auto;text-align:right;flex:none}
+.cashb span{display:block;font-family:var(--f-mono);font-size:9.5px;letter-spacing:.14em;color:var(--muted)}
+.cash{font-family:var(--f-mono);font-weight:500;font-size:19px;font-variant-numeric:tabular-nums;color:var(--good);transition:color .3s,text-shadow .3s}
+.cash.neg{color:var(--bad)}
+.cash.gain{text-shadow:0 0 14px var(--good)}
+.cash.loss{text-shadow:0 0 14px var(--bad)}
+
+.bars{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px 12px}
+.bar{cursor:pointer}
+.bar .lab{display:flex;justify-content:space-between;font-family:var(--f-mono);font-size:10px;letter-spacing:.04em;color:var(--muted);text-transform:uppercase;margin-bottom:3px;white-space:nowrap}
+.bar .lab i{font-style:normal;color:var(--fg);font-variant-numeric:tabular-nums}
+.trk{height:8px;border-radius:5px;background:rgba(255,255,255,.07);overflow:hidden}
+.fil{height:100%;border-radius:5px;transition:width .7s cubic-bezier(.2,.9,.3,1);position:relative;overflow:hidden}
+.fil::after{content:"";position:absolute;inset:0;background:linear-gradient(100deg,transparent 30%,rgba(255,255,255,.35) 50%,transparent 70%);transform:translateX(-100%);animation:shine 3.2s infinite}
+@keyframes shine{60%,100%{transform:translateX(100%)}}
+.f-happy{background:linear-gradient(90deg,#fbbf24,#34d399)}
+.f-health{background:linear-gradient(90deg,#fb5a6e,#34d399)}
+.f-smarts{background:linear-gradient(90deg,#22d3ee,#7c6cff)}
+.f-rep{background:linear-gradient(90deg,#7c6cff,#ff4fa3)}
+.f-heat{background:linear-gradient(90deg,#fbbf24,#ff3b30)}
+.f-guilt{background:linear-gradient(90deg,#8f93b8,#5b4bbd)}
+.bar.danger .trk{animation:danger .9s infinite}
+@keyframes danger{50%{box-shadow:0 0 10px 1px rgba(251,90,110,.8)}}
+
+#feed{flex:1;min-height:0;overflow-y:auto;padding:8px 14px 14px;display:flex;flex-direction:column;gap:7px;scroll-behavior:smooth}
+#feed::-webkit-scrollbar{width:6px}#feed::-webkit-scrollbar-thumb{background:var(--line);border-radius:3px}
+.div{align-self:center;margin:14px 0 4px;font-family:var(--f-mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--fg);padding:3px 12px;border-radius:999px;background:linear-gradient(90deg,rgba(124,108,255,.35),rgba(34,211,238,.25));border:1px solid var(--line)}
+.ln{position:relative;padding:9px 12px;border-radius:14px 14px 14px 4px;background:var(--glass2);border:1px solid var(--line);max-width:94%;overflow-wrap:anywhere}
+.ln.g{border-color:rgba(52,211,153,.4);background:linear-gradient(180deg,rgba(52,211,153,.10),var(--glass2))}
+.ln.b{border-color:rgba(251,90,110,.4);background:linear-gradient(180deg,rgba(251,90,110,.10),var(--glass2))}
+.ln.c{border-color:rgba(255,122,69,.45);background:linear-gradient(180deg,rgba(255,122,69,.12),var(--glass2))}
+.ln.s{align-self:center;text-align:center;font-style:italic;color:var(--muted);background:none;border-style:dashed}
+.ln.new{animation:pop .5s cubic-bezier(.2,.9,.3,1.25) both}
+@keyframes pop{0%{opacity:0;transform:translateY(14px) scale(.96)}100%{opacity:1;transform:none}}
+.chips{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px}
+.chip{font-family:var(--f-mono);font-size:10.5px;padding:2px 7px;border-radius:999px;background:rgba(255,255,255,.07);color:var(--muted);white-space:nowrap}
+.chip.up{color:var(--good);background:rgba(52,211,153,.13)}
+.chip.dn{color:var(--bad);background:rgba(251,90,110,.14)}
+.chip.nt{color:var(--gold);background:rgba(251,191,36,.13)}
+
+.panel{flex:none;max-height:40%;overflow-y:auto;border-top:1px solid var(--line);background:rgba(10,11,22,.7);padding:9px 10px;display:flex;flex-direction:column;gap:7px}
+.act{display:grid;grid-template-columns:38px minmax(0,1fr) auto;gap:10px;align-items:center;text-align:left;width:100%;padding:9px 11px;border:1px solid var(--line);border-radius:12px;background:var(--glass);transition:transform .15s,border-color .15s,box-shadow .15s}
+.act:hover:not(:disabled){border-color:var(--accent);transform:translateY(-1px);box-shadow:0 6px 18px rgba(124,108,255,.18)}
+.act:active:not(:disabled){transform:scale(.985)}
+.act:disabled{opacity:.45;cursor:not-allowed}
+.act .ic{width:38px;height:38px;border-radius:11px;background:rgba(124,108,255,.16);display:grid;place-items:center;font-size:20px}
+.act.hot .ic{background:rgba(255,122,69,.18)}
+.act.hot{border-color:rgba(255,122,69,.28)}
+.act strong{display:block;font-weight:600;font-size:14.5px}
+.act .rt{font-family:var(--f-mono);font-size:10.5px;color:var(--muted);text-align:right;white-space:nowrap}
+.rk{padding:2px 8px;border-radius:999px;font-weight:500}
+.rk1{color:var(--good);background:rgba(52,211,153,.13)}.rk2{color:var(--gold);background:rgba(251,191,36,.13)}
+.rk3{color:var(--heat);background:rgba(255,122,69,.16)}.rk4{color:#fff;background:var(--bad)}
+.empty{color:var(--muted);padding:12px 4px;text-align:center}
+
+.dock{flex:none;border-top:1px solid var(--line);background:rgba(10,11,22,.85);padding:8px 10px;padding-bottom:max(10px,env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:8px}
+.tabs{display:flex;gap:6px}
+.tab{flex:1;padding:8px 4px;border-radius:10px;border:1px solid var(--line);background:var(--glass);font-family:var(--f-mono);font-size:12px;color:var(--muted);transition:all .15s;white-space:nowrap}
+.tab[aria-selected="true"]{color:var(--fg);border-color:var(--accent);background:linear-gradient(180deg,rgba(124,108,255,.3),rgba(124,108,255,.12));box-shadow:0 0 16px rgba(124,108,255,.25)}
+.age{position:relative;overflow:hidden;width:100%;padding:14px;border-radius:14px;background:linear-gradient(135deg,var(--accent),var(--pink));color:#fff;font-family:var(--f-display);font-weight:800;font-size:19px;letter-spacing:.01em;box-shadow:0 8px 28px rgba(124,108,255,.4);transition:transform .12s,filter .2s}
+.age::after{content:"";position:absolute;inset:0;background:linear-gradient(100deg,transparent 35%,rgba(255,255,255,.35) 50%,transparent 65%);transform:translateX(-120%);animation:shine 3s infinite}
+.age:hover:not(:disabled){filter:brightness(1.1)}
+.age:active:not(:disabled){transform:scale(.97)}
+.age:disabled{opacity:.45;cursor:not-allowed;box-shadow:none}
+.age small{display:block;font-family:var(--f-mono);font-weight:500;font-size:10.5px;opacity:.85;letter-spacing:.08em;margin-top:1px}
+
+.overlay{position:fixed;inset:0;background:rgba(5,5,12,.7);backdrop-filter:blur(5px);-webkit-backdrop-filter:blur(5px);display:flex;align-items:center;justify-content:center;padding:16px;z-index:40}
+.card{position:relative;width:100%;max-width:450px;max-height:100%;overflow-y:auto;background:linear-gradient(180deg,#1b1d3a,#12132a);border:1px solid var(--line);border-radius:20px;padding:20px;display:flex;flex-direction:column;gap:12px;box-shadow:0 20px 70px rgba(0,0,0,.6),0 0 40px rgba(124,108,255,.18)}
+.card.pop{animation:card .38s cubic-bezier(.2,.9,.3,1.2)}
+@keyframes card{0%{opacity:0;transform:translateY(30px) scale(.94)}100%{opacity:1;transform:none}}
+.card .kick{display:flex;align-items:center;gap:8px;font-family:var(--f-mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--accent2)}
+.card .kick span{width:28px;height:28px;border-radius:9px;background:rgba(34,211,238,.13);display:grid;place-items:center;font-size:15px}
+.card h2{margin:0;font-family:var(--f-display);font-weight:800;font-size:23px;line-height:1.15;text-wrap:balance}
+.card p{margin:0;color:#d5d8f5}
+.tm{height:5px;border-radius:3px;background:rgba(255,255,255,.08);overflow:hidden}
+.tm i{display:block;height:100%;width:100%;background:linear-gradient(90deg,var(--gold),var(--bad));border-radius:3px}
+.opts{display:flex;flex-direction:column;gap:8px;margin-top:2px}
+.opt{position:relative;padding:11px 13px 11px 38px;border-radius:12px;border:1px solid var(--line);background:rgba(255,255,255,.04);text-align:left;font-weight:600;transition:transform .12s,border-color .15s,background .15s}
+.opt:hover{border-color:var(--accent);background:rgba(124,108,255,.14);transform:translateX(3px)}
+.opt:active{transform:scale(.98)}
+.opt .k{position:absolute;left:11px;top:11px;width:20px;height:20px;border-radius:6px;background:rgba(255,255,255,.1);display:grid;place-items:center;font-family:var(--f-mono);font-size:11px;color:var(--muted)}
+.opt.pri{background:linear-gradient(135deg,var(--accent),var(--pink));border-color:transparent;color:#fff}
+.opt.pri .k{background:rgba(255,255,255,.25);color:#fff}
+.opt.code{font-family:var(--f-mono);font-weight:500;font-size:12.5px;white-space:pre-wrap;padding:8px 10px 8px 38px}
+.opt .chips{margin-top:5px}
+.opt.pri .chip{background:rgba(255,255,255,.2);color:#fff}
+.sumgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.sumgrid div{background:rgba(255,255,255,.05);border:1px solid var(--line);border-radius:12px;padding:9px 11px}
+.sumgrid b{display:block;font-family:var(--f-mono);font-size:18px;font-variant-numeric:tabular-nums}
+.sumgrid span{font-size:12px;color:var(--muted)}
+.achg{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.achg div{display:flex;gap:9px;align-items:center;padding:8px 10px;border-radius:12px;border:1px solid var(--line);background:rgba(255,255,255,.04)}
+.achg div.lock{opacity:.4;filter:grayscale(1)}
+.achg em{font-style:normal;font-size:22px}
+.achg b{display:block;font-size:13px}.achg span{font-size:11px;color:var(--muted);line-height:1.25;display:block}
+.tomb{text-align:center;font-size:54px;line-height:1;filter:drop-shadow(0 0 18px rgba(124,108,255,.6))}
+
+#toasts{position:fixed;top:max(10px,env(safe-area-inset-top));left:0;right:0;z-index:100;display:flex;flex-direction:column;align-items:center;gap:6px;pointer-events:none;padding:0 12px}
+.toast{max-width:440px;padding:9px 14px;border-radius:12px;background:rgba(20,22,42,.95);border:1px solid var(--line);font-size:13.5px;box-shadow:0 8px 24px rgba(0,0,0,.5);animation:toast 3.4s both}
+.toast.g{border-color:var(--good)}.toast.b{border-color:var(--bad)}.toast.c{border-color:var(--heat)}.toast.gold{border-color:var(--gold);background:linear-gradient(135deg,#3a2f0b,#1b1530)}
+@keyframes toast{0%{opacity:0;transform:translateY(-14px) scale(.95)}8%{opacity:1;transform:none}85%{opacity:1}100%{opacity:0;transform:translateY(-6px)}}
+.fl{position:fixed;z-index:95;pointer-events:none;font-family:var(--f-mono);font-weight:500;font-size:15px;text-shadow:0 2px 8px #000;animation:fl 1.5s ease-out both}
+.fl.up{color:var(--good)}.fl.dn{color:var(--bad)}
+@keyframes fl{0%{opacity:0;transform:translateY(8px) scale(.8)}15%{opacity:1;transform:translateY(0) scale(1.15)}100%{opacity:0;transform:translateY(-38px)}}
+
+.title{position:fixed;inset:0;z-index:70;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:24px;text-align:center;background:radial-gradient(800px 500px at 50% 30%,rgba(124,108,255,.28),transparent 65%),rgba(6,6,14,.9);backdrop-filter:blur(6px)}
+.logo{font-family:var(--f-display);font-weight:800;font-size:clamp(54px,14vw,96px);letter-spacing:-.04em;line-height:1;position:relative}
+.logo b{background:linear-gradient(90deg,var(--accent),var(--accent2));-webkit-background-clip:text;background-clip:text;color:transparent}
+.logo::before,.logo::after{content:attr(data-t);position:absolute;left:0;right:0;top:0;opacity:.0;pointer-events:none}
+.logo::before{color:var(--pink);animation:gl1 4s infinite}
+.logo::after{color:var(--accent2);animation:gl2 4s infinite}
+@keyframes gl1{0%,92%,100%{opacity:0}93%{opacity:.8;transform:translate(-4px,1px);clip-path:inset(10% 0 55% 0)}96%{opacity:.8;transform:translate(3px,-2px);clip-path:inset(60% 0 10% 0)}}
+@keyframes gl2{0%,92%,100%{opacity:0}94%{opacity:.8;transform:translate(4px,-1px);clip-path:inset(40% 0 30% 0)}97%{opacity:.8;transform:translate(-3px,2px);clip-path:inset(5% 0 70% 0)}}
+.tag2{font-family:var(--f-mono);font-size:12px;letter-spacing:.2em;color:var(--muted);text-transform:uppercase}
+.tbtn{min-width:230px;padding:14px 22px;border-radius:14px;font-family:var(--f-display);font-weight:800;font-size:19px;border:1px solid var(--line);background:var(--glass);transition:transform .12s,box-shadow .2s}
+.tbtn.pri{background:linear-gradient(135deg,var(--accent),var(--pink));border-color:transparent;color:#fff;box-shadow:0 10px 34px rgba(124,108,255,.45)}
+.tbtn:hover{transform:translateY(-2px)}
+.tnote{max-width:380px;font-size:12.5px;color:var(--muted)}
+.tstat{font-family:var(--f-mono);font-size:11px;color:var(--muted)}
+
+@media (max-width:420px){.hrow{gap:9px}.cash{font-size:16px}.nameb h1{font-size:18px}.bars{gap:8px 9px}.achg{grid-template-columns:1fr}}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
+</style>
+</head><body>
+<canvas id="bg"></canvas>
+<div id="vig"></div>
+<div id="flash"></div>
+<canvas id="confetti"></canvas>
+
+<div id="app">
+  <header class="top">
+    <div class="brand"><b>Com</b>Life<small>#life-sim</small></div>
+    <button class="ib" id="achBtn" type="button" aria-label="Achievements">🏆</button>
+    <button class="ib" id="sndBtn" type="button" aria-label="Toggle sound">🔊</button>
+    <button class="ib wide" id="newBtn" type="button">New life</button>
+  </header>
+  <section class="hero">
+    <div class="hrow">
+      <div class="ava" id="ava"><div class="in" id="avaE">👶</div><div class="bd" id="avaB">😄</div></div>
+      <div class="nameb"><h1 id="nm"></h1><div class="sub" id="sub"></div></div>
+      <div class="cashb"><span>CASH</span><div class="cash" id="cash">$0</div></div>
+    </div>
+    <div class="bars" id="bars"></div>
+  </section>
+  <main id="feed" tabindex="0" aria-live="polite"></main>
+  <section class="panel" id="panel" hidden></section>
+  <nav class="dock">
+    <div class="tabs" id="tabs" role="tablist"></div>
+    <button class="age" id="ageBtn" type="button"></button>
+  </nav>
+</div>
+
+<div class="overlay" id="overlay" hidden><div class="card" id="card" role="dialog" aria-modal="true"></div></div>
+<div id="toasts"></div>
+
+<div class="title" id="title">
+  <div class="tag2">a life sim</div>
+  <div class="logo" data-t="ComLife"><b>Com</b>Life</div>
+  <div class="tag2">age up. make choices. live with them.</div>
+  <button class="tbtn pri" id="tCont" type="button">Continue life</button>
+  <button class="tbtn" id="tNew" type="button">New life</button>
+  <div class="tstat" id="tStat"></div>
+  <div class="tnote">Every choice has an upside and a downside. Every crime in this game has real victims, and the game keeps count.</div>
+</div>
+
+<script>
+(function(){
+'use strict';
+const $=s=>document.querySelector(s);
+const rnd=(a,b)=>a+Math.random()*(b-a);
+const ri=(a,b)=>Math.floor(rnd(a,b+1));
+const chance=p=>Math.random()<p;
+const clamp=(v,a=0,b=100)=>Math.max(a,Math.min(b,v));
+const pick=a=>a[Math.floor(Math.random()*a.length)];
+const money=n=>(n<0?'-$':'$')+Math.abs(Math.round(n)).toLocaleString('en-US');
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const SAVE='comlife-save-v3',META='comlife-meta-v1',MUTE='comlife-mute';
+let RM=false;try{RM=window.matchMedia('(prefers-reduced-motion: reduce)').matches}catch(e){}
+let S=null,ui={tab:'online',open:true,seen:0,cashShown:null},evq=[],cur=null,busy=false,timerH=null,confirmNew=false,HEAT=0,M={ach:{},lives:0,best:0};
+let D=[],F=[];
+
+/* ================= audio / haptics ================= */
+let AC=null,muted=false,lastSfx=0;
+try{muted=localStorage.getItem(MUTE)==='1'}catch(e){}
+function tone(f,d,type,v,t0){
+  if(muted)return;
+  try{
+    if(!AC)AC=new (window.AudioContext||window.webkitAudioContext)();
+    if(AC.state==='suspended')AC.resume();
+    const o=AC.createOscillator(),g=AC.createGain(),t=AC.currentTime+(t0||0);
+    o.type=type||'sine';o.frequency.value=f;
+    g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(v||.05,t+.01);g.gain.exponentialRampToValueAtTime(.0001,t+d);
+    o.connect(g);g.connect(AC.destination);o.start(t);o.stop(t+d+.03);
+  }catch(e){}
+}
+const SFX={
+  click:()=>tone(520,.06,'triangle',.05),
+  good:()=>[523,659,784].forEach((f,i)=>tone(f,.15,'triangle',.06,i*.07)),
+  bad:()=>[330,247,196].forEach((f,i)=>tone(f,.2,'sawtooth',.04,i*.09)),
+  cash:()=>{tone(880,.08,'square',.035);tone(1320,.16,'square',.035,.08);},
+  alert:()=>{for(let i=0;i<4;i++)tone(i%2?620:880,.11,'square',.045,i*.12);},
+  age:()=>{tone(220,.25,'sine',.05);tone(440,.2,'sine',.04,.1);},
+  tick:()=>tone(1000,.03,'square',.03),
+  death:()=>[392,330,262,196].forEach((f,i)=>tone(f,.45,'sine',.06,i*.24)),
+  win:()=>[523,659,784,1047].forEach((f,i)=>tone(f,.2,'triangle',.06,i*.09))
+};
+function sfx(k){const n=Date.now();if(n-lastSfx<110&&k!=='death'&&k!=='win')return;lastSfx=n;SFX[k]&&SFX[k]();}
+const buzz=p=>{try{navigator.vibrate&&navigator.vibrate(p)}catch(e){}};
+
+/* ================= visual fx ================= */
+function shake(){if(RM)return;document.body.classList.remove('shake');void document.body.offsetWidth;document.body.classList.add('shake');}
+function flash(c){if(RM)return;const f=$('#flash');f.style.background=c;f.classList.remove('go');void f.offsetWidth;f.classList.add('go');}
+const CF={p:[],run:false};
+function confetti(n,cols){
+  if(RM)return;
+  cols=cols||['#7c6cff','#22d3ee','#ff4fa3','#fbbf24','#34d399'];
+  const x=innerWidth/2,y=innerHeight*.4;
+  for(let i=0;i<n;i++)CF.p.push({x,y,vx:rnd(-7,7),vy:rnd(-13,-3),g:.3,r:rnd(3,7),c:pick(cols),a:1,rot:rnd(0,6),vr:rnd(-.3,.3)});
+  if(!CF.run){CF.run=true;requestAnimationFrame(cfFrame);}
+}
+function cfFrame(){
+  const cv=$('#confetti'),cx=cv.getContext('2d');
+  if(cv.width!==innerWidth||cv.height!==innerHeight){cv.width=innerWidth;cv.height=innerHeight;}
+  cx.clearRect(0,0,cv.width,cv.height);
+  CF.p=CF.p.filter(p=>p.a>.03&&p.y<cv.height+30);
+  CF.p.forEach(p=>{p.x+=p.vx;p.y+=p.vy;p.vy+=p.g;p.vx*=.99;p.a-=.008;p.rot+=p.vr;cx.save();cx.globalAlpha=Math.max(p.a,0);cx.translate(p.x,p.y);cx.rotate(p.rot);cx.fillStyle=p.c;cx.fillRect(-p.r,-p.r/2,p.r*2,p.r);cx.restore();});
+  if(CF.p.length)requestAnimationFrame(cfFrame);else{CF.run=false;cx.clearRect(0,0,cv.width,cv.height);}
+}
+function toast(t,k){
+  const box=$('#toasts');if(!box)return;
+  const d=document.createElement('div');d.className='toast '+(k||'');d.textContent=t;
+  box.appendChild(d);
+  while(box.children&&box.children.length>3)box.removeChild(box.children[0]);
+  setTimeout(()=>{try{d.remove()}catch(e){}},3500);
+}
+/* animated network background, tinted by heat */
+(function(){
+  const cv=$('#bg'),cx=cv.getContext('2d');let W=0,H=0,pts=[];
+  function size(){W=cv.width=innerWidth;H=cv.height=innerHeight;const n=Math.min(70,Math.floor(W*H/20000));pts=[];for(let i=0;i<n;i++)pts.push({x:Math.random()*W,y:Math.random()*H,vx:(Math.random()-.5)*.28,vy:(Math.random()-.5)*.28});}
+  function frame(){
+    cx.clearRect(0,0,W,H);
+    const hue=255-Math.min(HEAT,100)*2.3;
+    for(let i=0;i<pts.length;i++){
+      const p=pts[i];p.x+=p.vx;p.y+=p.vy;
+      if(p.x<0||p.x>W)p.vx*=-1;if(p.y<0||p.y>H)p.vy*=-1;
+      cx.fillStyle='hsla('+hue+',90%,70%,.55)';cx.beginPath();cx.arc(p.x,p.y,1.6,0,6.3);cx.fill();
+      for(let j=i+1;j<pts.length;j++){
+        const q=pts[j],dx=p.x-q.x,dy=p.y-q.y,d=dx*dx+dy*dy;
+        if(d<14000){cx.strokeStyle='hsla('+hue+',90%,70%,'+(.16*(1-d/14000))+')';cx.beginPath();cx.moveTo(p.x,p.y);cx.lineTo(q.x,q.y);cx.stroke();}
+      }
+    }
+    if(!RM&&!document.hidden)requestAnimationFrame(frame);else if(!RM)setTimeout(()=>requestAnimationFrame(frame),500);
+  }
+  size();addEventListener('resize',size);frame();
+})();
+
+/* ================= data ================= */
+const FIRST=['Jordan','Maya','Eli','Priya','Dante','Nora','Kai','Luca','Sofia','Marcus','Tess','Omar','Riley','Ana','Theo'];
+const LAST=['Reyes','Nguyen','Brooks','Patel','Kowalski','Okafor','Lindqvist','Moreno','Hale','Sato','Duarte','Finch'];
+const HANDLES=['nullpointer','ghostwire','lowtide','static','kernelpanic','paleface','driftwood','n0va','hexed','vantablack','sleeper','dustbin'];
+const PARTNERS=['Alex','Sam','Jules','Morgan','Casey','Robin','Quinn','Devon','Avery','Rowan'];
+const JOBS=[{n:'warehouse associate',p:31000},{n:'call center rep',p:34000},{n:'barista',p:27000},{n:'IT help desk tech',p:48000},{n:'delivery driver',p:36000},{n:'junior web developer',p:62000}];
+const FLAVOR=[
+ [3,9,'You broke your arm falling off the monkey bars.',{health:-8,happy:-3},'b'],
+ [3,12,'A teacher said you were one of the quick ones.',{smarts:4,happy:3},'g'],
+ [6,14,'You won your school spelling bee.',{smarts:3,happy:5},'g'],
+ [10,17,'You got grounded for staying up all night on your computer.',{happy:-4,smarts:2},'b'],
+ [12,18,'A friend moved away. The server became the only place you really talk.',{happy:-3,friends:-6},'n'],
+ [14,18,'You failed a test after a late night online.',{smarts:-3,happy:-2},'b'],
+ [15,19,'You went to a concert with friends. Best night of the year.',{happy:7,friends:5},'g'],
+ [18,30,'A roommate ate your leftovers. You are furious.',{happy:-3},'n'],
+ [18,60,'You got a speeding ticket.',{cash:-250,happy:-2},'b'],
+ [20,40,'You adopted a dog. It is a bad influence in the best way.',{happy:8,cash:-400},'g'],
+ [22,50,'Gas station sushi. You will never recover your dignity.',{health:-6},'b'],
+ [30,70,'You started jogging. Your knees disagree.',{health:4,happy:2},'g'],
+ [35,75,'You took a road trip with no plan.',{happy:6,cash:-300},'g'],
+ [40,80,'A back injury put you on the couch for a month.',{health:-6},'b']
+];
+const VOICE=['Four hours in voice chat. Someone sang. Nobody asked them to.','You laughed until your ribs hurt over a clip.','You stayed up too late arguing about nothing.'];
+const JAIL_LINES=['Another year of the same walls and the same schedule.','The days run together. You count marks on the wall.','You got a letter from home. You read it eleven times.','Lights out is the only part of the day that feels like yours.'];
+const SCAM_VICTIMS=['An older man handed over his savings.','A nurse on a night shift paid before she thought.','A college student emptied the account meant for rent.','A widow believed the voice on the phone for three hours.','A small shop owner paid out of habit.','A dad covering his kid\'s tuition lost it all.'];
+const DOX_OK=['You posted {t}\'s personal details in the server. Chat loved it. Their family got harassing messages for weeks.','Your post about {t} spread across three servers by morning. Real people on the other end stopped sleeping.','Strangers started showing up in {t}\'s replies and comments. It did not stop for days.','You dropped {t}\'s info in the main channel. It got screenshotted and shared everywhere.'];
+const DOX_BAD=['You posted details on the wrong person. A stranger got harassed for nothing and the server turned on you.','The info you posted was out of date. An innocent family got the messages instead.'];
+const SWAT_OK=['You called in a fake emergency. Police swarmed {t}\'s house. Nobody was hurt this time. The family did not sleep for days.','Armed officers surrounded {t}\'s home for hours. The footage ended up in your server.','A fake call sent a whole street into lockdown over {t}. People were terrified.'];
+const SWAT_FLAG=['Dispatchers flagged the call as fake. Nothing came of it, but it is still on record.','The call got cut off and nobody showed up. It is still logged.'];
+const SWAT_HARM=['Someone was injured in the response. It is on the news. The server cheered. You did not feel like cheering.','The response went wrong and a person ended up in the hospital. Your phone will not stop buzzing.'];
+const SWAT_TRACED=['The call was traced within hours.','A dispatcher kept the line open longer than you expected. The number came back to you.'];
+const BUGS=[
+ {t:'Password check',l:['function check(user, pass) {','  const stored = db.get(user);','  if (pass = stored) return true;','  return false;','}'],bad:2,why:'A single = assigns instead of comparing. It needs ===.'},
+ {t:'Cart total',l:['let total = 0;','for (let i = 0; i <= items.length; i++) {','  total += items[i].price;','}','return total;'],bad:1,why:'<= runs one step past the end of the list.'},
+ {t:'Greeting page',l:['const name = params.get("name");','page.innerHTML = "Hello " + name;','show(page);'],bad:1,why:'Raw input in innerHTML invites script injection. Use textContent.'},
+ {t:'Session tokens',l:['function newSession(user) {','  const token = Math.random().toString(36);','  store.set(token, user);','  return token;','}'],bad:1,why:'Math.random is predictable. Tokens need a secure random source.'},
+ {t:'File download',l:['const file = req.query.file;','res.sendFile("/public/" + file);','log(file);'],bad:1,why:'Unchecked file names can escape the folder with ../ tricks.'},
+ {t:'Reset email',l:['function resetPassword(email) {','  const user = db.find(email);','  user.password = "temp1234";','  sendMail(email, user.password);','}'],bad:2,why:'A fixed temporary password is guessable. Use a one-time random link.'}
+];
+const ACH=[
+ {id:'first_job',ic:'💼',n:'Clock In',d:'Get a real job.'},
+ {id:'diploma',ic:'🎓',n:'Diploma',d:'Get into college.'},
+ {id:'rich',ic:'💰',n:'Six Figures',d:'Hold $100,000 at once.'},
+ {id:'married',ic:'💍',n:'Til Death',d:'Get married.'},
+ {id:'bounty',ic:'🛡️',n:'White Hat',d:'Collect a bug bounty.'},
+ {id:'redeem',ic:'🕊️',n:'Walk Away',d:'Leave the Com.'},
+ {id:'confess',ic:'🗣️',n:'Face It',d:'Turn yourself in.'},
+ {id:'lockup',ic:'⛓️',n:'Doing Time',d:'Get sentenced.'},
+ {id:'oldtimer',ic:'🧓',n:'Long Haul',d:'Reach age 70.'},
+ {id:'ordinary',ic:'🌱',n:'Clean Slate',d:'Reach 60 without ever joining the Com.'}
+];
+const BARS=[['happy','😊','Happy'],['health','❤️','Health'],['smarts','🧠','Smarts'],['rep','⭐','Rep'],['heat','🔥','Heat'],['guilt','😔','Guilt']];
+const LBL={happy:'Happy',health:'Health',smarts:'Smarts',rep:'Rep',heat:'Heat',guilt:'Guilt',cash:'',family:'Family',friends:'Friends',crew:'Crew',partner:'Partner'};
+const INV={heat:1,guilt:1};
+const BONDS={family:1,friends:1,crew:1,partner:1};
+const KICK={Event:'⚡',DM:'💬',School:'🏫',Server:'🖥️',Street:'🚶',Home:'🏠','Voice chat':'🎧',Phone:'📞',Email:'✉️',Mail:'📬','Group chat':'👥',News:'📰',Road:'🚓',Meeting:'🕴️',Bank:'🏦',Family:'👪',Therapy:'🛋️',Partner:'💞',Hearing:'⚖️',Stat:'📊',Friend:'🤝',Shopping:'🛍️','Job listing':'📋','Outgoing call':'📞','On the call':'📞',Decision:'🧭','Choose a target':'🎯','Bug hunt':'🐞',Work:'💼',Night:'🌙',Social:'📱',Achievements:'🏆',Welcome:'👋',Health:'🩺',Luck:'🎟️',Sentence:'⚖️','The end':'🪦'};
+const kickIcon=k=>{if(!k)return '✦';for(const key in KICK)if(k.indexOf(key)===0)return KICK[key];return '✦';};
+
+/* ================= state ================= */
+function blank(){
+  return {name:pick(FIRST)+' '+pick(LAST),age:0,alive:true,seq:0,happy:ri(65,90),health:ri(75,100),smarts:ri(30,70),rep:0,heat:0,guilt:0,cash:0,
+    bond:{family:ri(55,85),friends:ri(40,70),crew:0,partner:0},partner:null,married:false,
+    handle:null,discord:false,com:false,everCom:false,server:false,exTarget:false,job:null,college:false,ged:false,legit:0,record:0,inside:0,jail:null,
+    retainer:false,declined:0,beef:0,seen:{},cool:{},crimeYr:false,
+    crimes:{dox:0,swat:0,scam:0,crypto:0,ato:0,harm:0},tot:{dox:0,swat:0,scam:0,crypto:0,ato:0,harm:0},peakRep:0,did:{},log:[],ended:null};
+}
+function say(t,c){
+  let g=S.log[S.log.length-1];
+  if(!g||g.age!==S.age){g={age:S.age,lines:[]};S.log.push(g);}
+  g.lines.push({id:++S.seq,t:t,c:c||'n',d:D});
+  const chips=D;D=[];
+  if(S.log.length>120)S.log.shift();
+  if(c==='g'){sfx('good');}
+  else if(c==='b'){sfx('bad');flash('rgba(251,90,110,.55)');
+    if(chips.some(x=>(x[0]==='happy'||x[0]==='health')&&x[1]<=-10)){shake();buzz(80);}}
+  else if(c==='c'){sfx('alert');flash('rgba(255,122,69,.5)');}
+  if(chips.some(x=>x[0]==='cash'&&x[1]>0))setTimeout(()=>sfx('cash'),130);
+  if(c==='g'||c==='b'||c==='c')toast(t,c);
+}
+function mod(o){
+  for(const k in o){
+    const v=o[k];if(!v)continue;
+    let before,after;
+    if(k==='cash'){before=S.cash;S.cash+=v;after=S.cash;}
+    else if(BONDS[k]){before=S.bond[k];S.bond[k]=clamp(before+v);after=S.bond[k];}
+    else{before=S[k];S[k]=clamp(before+v);after=S[k];}
+    const d=Math.round(after-before);if(!d)continue;
+    D.push([k,d]);F.push([k,d]);
+  }
+  if(S.rep>S.peakRep)S.peakRep=S.rep;
+}
+const GUILT={dox:5,swat:8,scam:6,crypto:9,ato:8,harm:12};
+function crime(k){S.crimes[k]++;S.tot[k]++;S.crimeYr=true;mod({guilt:GUILT[k]});}
+const pending=()=>{const c=S.crimes;return c.dox+c.swat+c.scam+c.crypto+c.ato+c.harm;};
+const crimesEver=()=>{const c=S.tot;return c.dox+c.swat+c.scam+c.crypto+c.ato;};
+function unlock(id){
+  if(M.ach[id])return;M.ach[id]=1;saveMeta();
+  const a=ACH.find(x=>x.id===id);if(!a)return;
+  toast(a.ic+' Achievement: '+a.n,'gold');sfx('win');confetti(70);
+}
+function saveMeta(){try{localStorage.setItem(META,JSON.stringify(M))}catch(e){}}
+function loadMeta(){try{const r=localStorage.getItem(META);if(r){const m=JSON.parse(r);if(m&&m.ach)M=m;}}catch(e){}}
+
+/* ================= tags / chips ================= */
+function tags(str){
+  if(!str)return '';
+  return '<div class="chips">'+str.split('|').map(s=>{
+    const k=s[0]==='+'?'up':s[0]==='-'?'dn':s[0]==='~'?'nt':'';
+    return '<span class="chip '+k+'">'+esc(k?s.slice(1):s)+'</span>';
+  }).join('')+'</div>';
+}
+function deltaChips(d){
+  if(!d||!d.length)return '';
+  return '<div class="chips">'+d.map(x=>{
+    const k=x[0],v=x[1],good=INV[k]?v<0:v>0;
+    const txt=k==='cash'?(v>0?'+':'-')+'$'+Math.abs(v).toLocaleString('en-US'):(v>0?'+':'')+v+' '+LBL[k];
+    return '<span class="chip '+(good?'up':'dn')+'">'+esc(txt)+'</span>';
+  }).join('')+'</div>';
+}
+
+/* ================= modal system ================= */
+function queue(ev){evq.push(ev);if(!busy)showNext();}
+function Q(kick,title,text,opts,more){queue(Object.assign({kick:kick,title:title,text:text,opts:opts},more||{}));}
+function o(label,fn,tg,pri,cls){return {label:label,fn:fn,tg:tg,pri:pri,cls:cls};}
+function showNext(){
+  clearInterval(timerH);
+  const ev=evq.shift();
+  if(!ev){busy=false;cur=null;$('#overlay').hidden=true;render();return;}
+  busy=true;cur=ev;ev.locked=false;
+  const card=$('#card');
+  const opts=ev.opts||[{label:'OK',pri:true}];
+  ev.opts=opts;
+  card.innerHTML=(ev.kick?'<div class="kick"><span>'+kickIcon(ev.kick)+'</span>'+esc(ev.kick)+'</div>':'')+
+    '<h2>'+esc(ev.title)+'</h2>'+(ev.text?'<p>'+esc(ev.text)+'</p>':'')+(ev.html||'')+
+    (ev.timer?'<div class="tm"><i></i></div>':'')+'<div class="opts"></div>';
+  const box=card.querySelector('.opts');
+  opts.forEach((op,i)=>{
+    const b=document.createElement('button');b.type='button';b.className='opt'+(op.pri?' pri':'')+(op.cls?' '+op.cls:'');
+    b.innerHTML='<span class="k">'+(i+1)+'</span>'+esc(op.label)+tags(op.tg);
+    b.addEventListener('click',()=>choose(i));
+    box.appendChild(b);
+  });
+  card.classList.remove('pop');void card.offsetWidth;card.classList.add('pop');
+  $('#overlay').hidden=false;
+  const f=box.querySelector('button');if(f)f.focus();
+  if(ev.timer){
+    ev.t=ev.timer;const bar=card.querySelector('.tm i');let n=0;
+    timerH=setInterval(()=>{
+      ev.t-=.1;n++;if(bar)bar.style.width=Math.max(0,ev.t/ev.timer*100)+'%';
+      if(ev.t<=3&&n%10===0)sfx('tick');
+      if(ev.t<=0){clearInterval(timerH);expire();}
+    },100);
+  }
+}
+function expire(){
+  if(!cur||cur.locked)return;
+  if(cur.onTimeout){cur.locked=true;cur.onTimeout();render();showNext();}
+  else choose(cur.def||0);
+}
+function choose(i){
+  if(!cur||cur.locked)return;
+  const op=cur.opts[i];if(!op)return;
+  cur.locked=true;clearInterval(timerH);sfx('click');
+  if(op.fn)op.fn();
+  render();
+  showNext();
+}
+
+/* ================= consequences ================= */
+function raid(){
+  const j=S.age<18;
+  Q('Event',j?'Police at the door':'Federal agents at the door','Early morning. They have a warrant, and your devices are going into evidence bags. The server you spent years in has gone quiet.',[
+    o('Cooperate and name names',()=>{sentence(.5,'You cooperated. Your old crew will know.',-35);S.com=false;mod({crew:-40});},'+Shorter sentence|-Rep|-Crew|-Standing for good'),
+    j?o('Let your parents hire a lawyer',()=>{mod({happy:-6,family:-10});sentence(.7,'Your parents found a lawyer. They have not said much since.',0);},'~Lighter sentence|-Family|-Happy')
+     :o(S.retainer?'Call your retained lawyer':'Hire a private lawyer ($15,000)',()=>{
+        if(S.retainer){S.retainer=false;sentence(.6,'Your retained lawyer was in the room within the hour.',0);}
+        else if(S.cash>=15000){mod({cash:-15000});sentence(.7,'Your lawyer bargained hard.',0);}
+        else sentence(1,'You could not afford a private lawyer. The public defender had forty other cases.',0);},
+        S.retainer?'+Already paid for|+Lighter sentence':'-$15,000|+Better odds'),
+    o('Delete everything and deny it',()=>{
+        if(chance(.45))sentence(1.45,'They had backups. Obstruction was added to the charges.',0);
+        else sentence(.9,'Some evidence was gone. Not all of it.',0);},'~Gamble|-Obstruction charges if it fails')
+  ],{timer:12,def:2});
+  sfx('alert');shake();buzz([120,60,120]);
+}
+function sentence(mult,msg,repHit){
+  const c=S.crimes,juv=S.age<18;
+  const sev=c.dox*.6+c.swat*2+c.scam*.8+c.crypto*2.5+c.ato*3+c.harm*6+(S.server?2:0);
+  let yrs=sev*rnd(.7,1.3)*mult;
+  if(juv)yrs=Math.min(yrs*.5,4);
+  yrs=Math.round(Math.min(yrs,25)*2)/2;
+  const hurt=c.harm>0||c.swat>0;
+  S.crimes={dox:0,swat:0,scam:0,crypto:0,ato:0,harm:0};
+  S.heat=0;S.server=false;S.record++;
+  if(repHit)mod({rep:repHit});
+  mod({family:-15});
+  say(msg,'c');
+  if(yrs<1){
+    const fine=ri(2000,9000);mod({cash:-fine,happy:-12});
+    say('Probation and a '+money(fine)+' fine. A conviction with your real name on it.','b');
+  }else{
+    S.jail={yrs:yrs,juv:juv};mod({happy:-25});
+    if(S.job){say('You lost your job as a '+S.job.n+'.','b');S.job=null;}
+    if(S.partner&&chance(.45)){say(S.partner.n+' left. They could not do this.','b');S.partner=null;S.married=false;S.bond.partner=0;}
+    say((hurt?'The judge read statements from the people you targeted. ':'')+'You were sentenced to '+yrs+' year'+(yrs===1?'':'s')+' in '+(juv?'juvenile detention':'prison')+'.','b');
+    ui.tab='lockup';unlock('lockup');shake();buzz(250);
+  }
+}
+function immediateRaid(){S.heat=100;raid();}
+function investigate(){
+  if(!pending()||S.jail)return;
+  let p=S.heat>=90?.9:clamp((S.heat-25)/130,0,.8);
+  if(S.crimes.swat||S.crimes.harm)p+=.08;
+  if(chance(p))raid();
+}
+
+/* ================= crimes ================= */
+const DOXT=[
+ {n:'A rival gamer',tg:'+Small rep|~Low risk',rep:7,heat:11,hard:0},
+ {n:'A streamer',tg:'+More rep|-More heat',rep:14,heat:20,hard:.1},
+ {n:'Someone who snitched',tg:'+Rep|-Personal and risky',rep:9,heat:18,hard:.05},
+ {n:'A stranger who insulted you',tg:'+Quick|-Petty',rep:5,heat:9,hard:0}
+];
+const SWATT=[
+ {n:'A rival gamer',tg:'+Rep|~Lowest risk of the four',rep:10,heat:22,harm:.1},
+ {n:'A streamer mid-broadcast',tg:'+Huge rep|-Someone often gets hurt',rep:22,heat:35,harm:.22},
+ {n:'An ex-friend',tg:'+Rep|-Traces back to you faster',rep:6,heat:28,harm:.14},
+ {n:'A stranger who disrespected you',tg:'+Rep|-Reckless',rep:8,heat:18,harm:.1}
+];
+function doDox(t,cash){
+  crime('dox');
+  if(chance(.5+S.smarts/250-t.hard)){
+    mod({rep:t.rep+ri(0,3),heat:t.heat+ri(0,5),crew:3});
+    if(cash)mod({cash:cash});
+    say(pick(DOX_OK).replace('{t}',t.n.toLowerCase()),'c');
+    followUp('dox');
+  }else{
+    mod({rep:-3,heat:ri(6,10),happy:-6});
+    say(pick(DOX_BAD),'c');
+  }
+}
+function doSwat(t,cash){
+  crime('swat');
+  if(chance(t.harm)){
+    crime('harm');mod({rep:t.rep+8,heat:t.heat+20,happy:-20});
+    say(pick(SWAT_HARM),'c');followUp('swatHarm');return;
+  }
+  if(chance(.15)){say(pick(SWAT_TRACED),'c');immediateRaid();return;}
+  if(chance(.55)){
+    mod({rep:t.rep,heat:t.heat,happy:-3,crew:3});
+    if(cash)mod({cash:cash});
+    say(pick(SWAT_OK).replace('{t}',t.n.toLowerCase()),'c');followUp('swat');
+  }else{mod({rep:2,heat:8});say(pick(SWAT_FLAG),'c');}
+}
+function scamCall(cfg){
+  if(chance(cfg.p)){
+    crime('scam');const c=ri(cfg.lo,cfg.hi);mod({cash:c,heat:cfg.heat,happy:-2,crew:2});
+    say(cfg.ok+' You pulled '+money(c)+'. '+pick(SCAM_VICTIMS),'c');followUp('scam');
+  }else{mod({heat:4,rep:-1});say(cfg.fail,'n');}
+}
+function callGame(){
+  let q=0,mult=1;
+  function finish(){
+    const p=clamp(.35+q/100+S.smarts/300,.1,.9);
+    if(chance(p)){
+      crime('crypto');const c=Math.round(ri(6000,45000)*mult);mod({cash:c,heat:ri(20,28),rep:6,crew:3});
+      say('You posed as “CoinVault support” and the target went along. You got '+money(c)+'.','c');
+      if(chance(.3)){crime('harm');mod({happy:-10});say('The victim lost their retirement fund. They filed a report.','b');}
+      followUp('crypto');
+    }else{mod({heat:10,rep:-2});say('The target hung up and called the real exchange.','n');}
+  }
+  function step3(){Q('On the call','They are almost there','They are hesitating. You can push once more or take what you have.',[
+    o('Take the win and end the call',()=>{q+=5;finish();},'+Safer|-Smaller payout'),
+    o('Stretch it for more',()=>{q-=10;mult*=1.5;finish();},'+Bigger payout|-Bigger risk')],{timer:8,def:0});}
+  function step2(){Q('On the call','They sound suspicious','A long pause. Then: “Wait, is this really CoinVault?”',[
+    o('Stay calm and patient',()=>{q+=10;step3();},'+Better odds|~Slower'),
+    o('Push harder',()=>{q-=5;mult*=1.2;step3();},'+Bigger payout|-Worse odds'),
+    o('Hang up',()=>{mod({heat:2,rep:-1});say('You hung up before it went anywhere.','n');},'+Safe|-No payout')],{timer:8,def:0});}
+  Q('Outgoing call','Call as exchange support','Someone picks up. How do you open?',[
+    o('Friendly and helpful',()=>{q+=10;step2();},'+Better odds'),
+    o('Urgent and serious',()=>{q+=5;mult*=1.3;step2();},'+Bigger payout|-Pushy'),
+    o('Confident and fast',()=>{mult*=1.2;step2();},'+Some extra payout'),
+    o('Back out',()=>{S.did.crypto=false;},'+No harm done')]);
+}
+function pickTarget(title,list,fn,id){
+  Q('Choose a target',title,'Whoever you pick, a real person is on the other end.',list.map(t=>o(t.n,()=>fn(t),t.tg)).concat([o('Back out',()=>{S.did[id]=false;},'+No harm done')]));
+}
+function comInvite(){
+  Q('DM','A DM from a stranger','“You seem sharp. There is a private server where people actually get things done.”',[
+    o('Reply: “I\'m in.”',()=>{S.com=true;S.everCom=true;S.handle='@'+pick(HANDLES)+ri(1,99);mod({rep:5,heat:3,crew:15});say('You joined the Com as '+S.handle+'.','c');},'+Rep|+Crew|-Heat starts here|-Real victims later',true),
+    o('Reply: “Not interested.”',()=>{S.declined++;mod({happy:2});say('You closed the DM. Nothing happened.','g');},'+Stay clean|+Happy')]);
+}
+function followUp(k){
+  const F={
+    dox:()=>Q('DM','A message from their family','“Why would you do this to us? Our kids are afraid to open the door.”',[
+      o('Apologize',()=>{mod({happy:6,rep:-4,guilt:-6});say('You apologized. They did not answer.','g');},'-Guilt|+Happy|-Rep'),
+      o('Mock them',()=>{mod({rep:4,happy:-4,heat:4,guilt:5});say('You mocked them in the server. Chat laughed.','c');},'+Rep|-Heat|-Guilt grows'),
+      o('Block and move on',()=>{mod({happy:-1});say('You blocked them.','n');},'~Nothing changes')]),
+    swat:()=>Q('Server','Chat wants a victory post','“Post the clip.” Everyone is waiting.',[
+      o('Post it',()=>{mod({rep:8,heat:10,crew:3});say('You posted the clip. It spread.','c');},'+Rep|+Crew|-Heat'),
+      o('Stay quiet',()=>{mod({heat:-3,rep:-2});say('You said nothing.','n');},'+Less heat|-Rep'),
+      o('Delete your logs',()=>{if(chance(.2)){mod({heat:10});say('Wiping everything at once looked suspicious.','c');}else{mod({heat:-5});say('You cleaned up.','n');}},'~Gamble|-Might look suspicious')]),
+    swatHarm:()=>Q('News','Someone was hurt','The news says the person is in the hospital. Your phone is full of messages.',[
+      o('Turn yourself in',()=>{unlock('confess');sentence(.6,'You walked into a station and told them everything.',-20);S.com=false;mod({guilt:-30,crew:-30});},'+Shorter sentence|-Guilt|-Freedom'),
+      o('Keep quiet',()=>{mod({happy:-10,guilt:8});say('You kept quiet. You did not sleep.','b');},'-Happy|-Guilt grows'),
+      o('Brag about it',()=>{mod({rep:10,heat:20,happy:-8,friends:-8});say('You bragged in the server. Some people stopped talking to you.','c');},'+Rep|-Heat|-Friends')]),
+    scam:()=>Q('Phone','The victim calls back','They are crying and asking if you can fix it.',[
+      o('Hang up',()=>{mod({heat:2,happy:-3,guilt:3});say('You hung up.','b');},'~Keep the money|-Guilt'),
+      o('Refund part of it',()=>{mod({cash:-Math.round(Math.max(S.cash,0)*.2),happy:6,heat:-3,guilt:-8});say('You sent part of it back. It did not feel like enough.','g');},'-20% of cash|+Happy|-Guilt'),
+      o('Block the number',()=>{mod({heat:1});say('You blocked them.','n');},'~Nothing changes')]),
+    crypto:()=>Q('Email','The exchange is investigating','A notice says a wave of fake support calls is being traced.',[
+      o('Go quiet for a while',()=>{mod({heat:-12,rep:-3});say('You stopped for a while.','n');},'+Less heat|-Rep'),
+      o('Keep going',()=>{mod({heat:8,rep:3});say('You ignored the notice.','c');},'+Rep|-Heat')])
+  };
+  if(F[k])F[k]();
+}
+function bounty(){
+  const set=BUGS.slice().sort(()=>Math.random()-.5).slice(0,3);let ok=0;
+  function round(r){
+    if(r>=3)return finishB();
+    const p=set[r];
+    Q('Bug hunt '+(r+1)+'/3',p.t,'One line is the bug. Click it before the timer runs out.',
+      p.l.map((ln,i)=>o(ln,()=>{
+        if(i===p.bad){ok++;say('Found it. '+p.why,'g');}
+        else say('Wrong line. '+p.why,'n');
+        round(r+1);},'',false,'code')),
+      {timer:14,onTimeout:()=>{say('Time ran out. '+p.why,'n');round(r+1);}});
+  }
+  function finishB(){
+    if(!ok){mod({happy:-2,smarts:1});say('Every report was rejected. Back to the docs.','b');return;}
+    const c=ok*ri(500,3500);S.legit++;
+    mod({cash:c,smarts:ok*2,guilt:-ok*4,heat:-3,happy:3+ok*2});
+    say('A company paid you '+money(c)+' for reporting '+ok+' security hole'+(ok>1?'s':'')+'.','g');
+    unlock('bounty');if(c>=3000)confetti(50);
+  }
+  round(0);
+}
+
+/* ================= random events ================= */
+const E=[
+ {id:'bully',min:6,max:14,once:1,run(){Q('School','A kid keeps taking your lunch money','Every day at the same table, same kid, same hand out.',[
+   o('Tell a teacher',()=>{if(chance(.5)){mod({happy:2});say('The teacher stepped in. The lunch money stopped.','g');}else{mod({happy:-4});say('The teacher did nothing. It got worse.','b');}},'~50/50|+Safe'),
+   o('Fight back',()=>{if(chance(.5)){mod({happy:4,rep:2});say('You stood up for yourself and won.','g');}else{mod({health:-6,happy:-4});say('You lost the fight, but the kid left you alone after.','b');}},'~50/50|-Might get hurt'),
+   o('Plan revenge online later',()=>{mod({happy:2,guilt:2});S.beef++;say('You spent a night planning something. It felt good for a while.','n');},'+Feels good|-Dark habit')]);}},
+ {id:'cheat',min:8,max:17,once:1,run(){Q('School','A friend slides you the test answers','Quiet voice: “Just copy it. Nobody will know.”',[
+   o('Copy them',()=>{mod({smarts:-2});if(chance(.3)){mod({happy:-6,family:-4});say('The teacher caught you. Your parents were called.','b');}else{mod({happy:3});say('You got a great grade and learned nothing.','n');}},'+Easy A|-Learn nothing|-Might get caught'),
+   o('Refuse',()=>{mod({smarts:1,happy:1,friends:-3});say('You did it yourself.','g');},'+Smarts|-Friend annoyed')]);}},
+ {id:'wallet',min:8,max:15,once:1,run(){Q('Street','You find a wallet','There is cash inside and an ID with an address.',[
+   o('Return it',()=>{mod({happy:4,cash:20,guilt:-2});say('You returned the wallet. The owner gave you a hug and $20.','g');},'+Happy|+$20'),
+   o('Keep the cash',()=>{mod({cash:60,happy:-3,guilt:4});say('You kept $60 and tossed the wallet.','b');},'+$60|-Guilt')]);}},
+ {id:'allowance',min:9,max:15,once:1,run(){Q('Home','Your parents offer you an allowance','It comes with chores.',[
+   o('Do the chores',()=>{mod({cash:300,happy:-1,family:3});say('You earned $300 this year.','g');},'+$300|+Family|-Boring'),
+   o('Skip it',()=>{mod({happy:2});say('You skipped the chores and the allowance.','n');},'+Free time|-No cash')]);}},
+ {id:'science',min:9,max:16,once:1,run(){Q('School','Science fair','Your teacher wants you to enter.',[
+   o('Enter',()=>{if(chance(.5+S.smarts/200)){mod({smarts:4,happy:6});say('You won a ribbon.','g');}else{mod({happy:-2});say('Your project fell apart on the table.','b');}},'+Smarts|~Might flop'),
+   o('Skip it',()=>{say('You skipped it.','n');},'~Nothing happens')]);}},
+ {id:'school',min:10,max:17,once:1,when:()=>S.com&&S.heat>=20,run(){Q('School','The principal calls you in','Police asked about an online threat tied to your school.',[
+   o('Deny everything',()=>{if(chance(.5)){mod({heat:-8});say('They had nothing. You walked out.','n');}else{mod({heat:8,happy:-6});say('They did not believe you.','b');}},'~50/50|+Less heat if it works'),
+   o('Own up',()=>{mod({heat:-15,happy:-10,rep:-5,guilt:-5,family:-5});say('You admitted it. Your parents were called.','b');},'+Heat down|-Rep|-Family'),
+   o('Blame a friend',()=>{mod({heat:-10,happy:-8,friends:-15,guilt:6});say('The friend took the blame. You do not look at each other anymore.','b');},'+Heat down|-Friends|-Guilt')]);}},
+ /* online */
+ {id:'discordJoin',min:11,max:12,w:5,when:()=>!S.discord,run(){Q('Server','Everyone is on Discord','A friend sends you an invite to their gaming server.',[
+   o('Join',()=>{S.discord=true;mod({happy:5,friends:4});say('You joined a gaming server. The voice channels never close.','g');},'+Happy|+Friends|~New doors open',true),
+   o('Not yet',()=>{say('You said maybe later.','n');},'~Nothing happens')]);}},
+ {id:'freeNitro',min:11,max:17,once:1,when:()=>S.discord,run(){Q('DM','“You won free Nitro”','A DM from a stranger with a link.',[
+   o('Click it',()=>{if(chance(.6)){mod({happy:-6,friends:-4});say('Your account got hijacked and used to spam your friends.','b');}else{mod({smarts:-1});say('It was nothing. Your heart is still racing.','n');}},'~Might be a scam|-Could lose your account'),
+   o('Report it and move on',()=>{mod({smarts:2});say('You reported it.','g');},'+Smarts|+Safe')]);}},
+ {id:'toxicVC',min:12,once:1,when:()=>S.discord,run(){Q('Voice chat','Someone will not stop trash-talking you','They have been at it for an hour.',[
+   o('Roast them back',()=>{mod({happy:3,rep:S.com?2:0});S.beef++;say('You won the roast battle. They remembered it.','n');},'+Happy|-Makes an enemy'),
+   o('Mute them',()=>{mod({happy:1});say('You muted them. Peace.','g');},'+Peace'),
+   o('Report them',()=>{mod({smarts:1});say('You reported them to the mods.','g');},'+Smarts|~Slow')]);}},
+ {id:'modRole',min:13,once:1,when:()=>S.discord&&!S.com,run(){Q('Server','They offer you a mod role','The admins say you are one of the good ones.',[
+   o('Accept',()=>{mod({happy:4,smarts:2,friends:5});say('You became a mod. You mostly banned spammers.','g');},'+Happy|+Friends|-Time sink'),
+   o('Decline',()=>{say('You said no thanks.','n');},'~Nothing happens')]);}},
+ {id:'viral',min:12,once:1,when:()=>S.discord,run(){Q('Social','A clip of you goes viral','Thousands of strangers are watching you say something dumb.',[
+   o('Lean into it',()=>{if(chance(.6)){mod({happy:8,rep:S.com?6:0,friends:4});say('You embraced the meme. People love you for it.','g');confetti(40);}else{mod({happy:-8,friends:-4});say('The comments turned mean fast.','b');}},'+Fame|~60/40|-Might backfire'),
+   o('Delete everything',()=>{mod({happy:-2});say('You deleted it. It was already reposted everywhere.','n');},'~Too late')]);}},
+ {id:'comInvite',min:13,w:4,cd:2,when:()=>S.discord&&!S.com&&S.declined<3,run(){comInvite();}},
+ /* com lifecycle */
+ {id:'proveIt',min:13,once:1,w:3,when:()=>S.com&&S.rep<20,run(){Q('DM','“Prove you are serious”','A senior member says you need to show you are not just talk.',[
+   o('Dox a rival gamer',()=>{doDox(DOXT[0]);},'+Rep|-Heat|-Guilt|-Real victim'),
+   o('Run a small scam call',()=>{scamCall({p:.6,lo:200,hi:1200,heat:6,ok:'You ran a small call.',fail:'They hung up.'});},'+Cash|-Heat|-Guilt|-Real victim'),
+   o('Skip it',()=>{mod({rep:-3,crew:-5});say('You said you were not ready.','n');},'+Stay clean|-Rep|-Crew')]);}},
+ {id:'paidDox',min:13,cd:3,w:2,when:()=>S.com,run(){Q('DM from @'+pick(HANDLES),'Someone offers you money','“$150 if you put a certain person\'s info up. Their name is in the doc.”',[
+   o('Do it',()=>{doDox(pick(DOXT),150);},'+$150|+Rep|-Heat|-Guilt|-Real victim'),
+   o('Say no',()=>{mod({rep:-2,happy:2,crew:-3});say('You told them no.','g');},'+Happy|-Rep|-Crew'),
+   o('Screenshot it and send it to a tip line',()=>{mod({heat:-10,rep:-25,crew:-25,guilt:-8});S.legit++;S.exTarget=true;say('You reported the message. Some people in the scene will find out.','g');},'+Heat down|-Guilt|-Rep|-Crew|-Enemies')]);}},
+ {id:'paidSwat',min:15,cd:3,w:2,when:()=>S.com&&S.rep>=10,run(){Q('DM from @'+pick(HANDLES),'Someone offers you money','“$400 if a certain house gets a visit tonight. Name is in the doc. You in?”',[
+   o('Do it',()=>{doSwat(pick(SWATT),400);},'+$400|+Rep|-Heat|-Someone may get hurt'),
+   o('Say no',()=>{mod({rep:-3,happy:2,crew:-3});say('You told them no. They found someone else.','g');},'+Happy|-Rep|-Crew'),
+   o('Screenshot it and send it to a tip line',()=>{mod({heat:-10,rep:-25,crew:-25,guilt:-8});S.legit++;S.exTarget=true;say('You reported the message. Some people in the scene will find out.','g');},'+Heat down|-Guilt|-Rep|-Crew|-Enemies')]);}},
+ {id:'streamerPush',min:16,once:1,when:()=>S.com&&S.rep>=20,run(){Q('Group chat','“Imagine the clip”','Everyone is pushing you to hit a streamer during a live broadcast.',[
+   o('Do it',()=>{doSwat(SWATT[1]);},'+Huge rep|-Huge heat|-Someone often gets hurt'),
+   o('Not worth it',()=>{mod({rep:-3,crew:-4,guilt:-2});say('You stayed out of it. Someone else did it instead.','n');},'+Stay clean|-Rep|-Crew')]);}},
+ {id:'rivalDox',min:13,cd:5,when:()=>S.com,run(){Q('Event','Someone posted your info','A rival put your real details in a public channel. Your phone will not stop.',[
+   o('Retaliate',()=>{doDox(DOXT[0]);},'+Rep|-Heat|-Guilt|-Real victim'),
+   o('Change numbers and go quiet',()=>{mod({happy:-10,cash:-300});say('You changed everything you could. It took weeks to feel safe.','b');},'+Stay clean|-$300|-Happy')]);}},
+ {id:'swatBack',once:1,when:()=>S.com&&S.rep>=20,run(){Q('Event','Armed officers outside your door','Flashlights, shouted commands, your family in the hallway. Someone sent a fake call about you.',[
+   o('Comply slowly with your hands visible',()=>{mod({happy:-15,heat:8,family:-4});say('You got through it. The call was fake. You know exactly how that feels now.','b');},'+Safe|-Happy|-Family'),
+   o('Panic and film it',()=>{mod({happy:-20,rep:10,health:-5});say('You filmed all of it. The clip made you famous in the wrong place.','b');shake();},'+Rep|-Happy|-Health')]);}},
+ {id:'friendArrested',cd:6,when:()=>S.com,run(){Q('Event','A regular got arrested','Someone from the server was picked up this week. Their messages are all over the group chat.',[
+   o('Go silent',()=>{mod({heat:-5,happy:-4,crew:-5});say('You stopped posting. The server felt colder.','n');},'+Less heat|-Crew|-Happy'),
+   o('Warn everyone else',()=>{mod({rep:5,heat:10,crew:6});say('You told the whole server to watch out. People noticed who talked first.','n');},'+Rep|+Crew|-Heat')]);}},
+ {id:'subpoena',cd:5,when:()=>S.com&&S.heat>=20,run(){mod({heat:15});say('A legal request landed on the platform asking about accounts in your server.','c');}},
+ {id:'biggerCrew',once:1,when:()=>S.com&&S.rep>=15,run(){Q('Event','A bigger crew wants you','A higher-ranked member offers you a seat. Nothing is free.',[
+   o('Accept',()=>{mod({rep:12,heat:10,crew:10});say('You joined the bigger crew. Now you owe people.','n');},'+Rep|+Crew|-Heat|-You owe them'),
+   o('Decline',()=>{mod({rep:-2});say('You turned them down. The invite did not come twice.','n');},'+Independence|-Rep')]);}},
+ {id:'banned',cd:8,when:()=>S.com,run(){mod({rep:-8,crew:-6});say('A moderator banned you from your main server over drama.','b');}},
+ {id:'betray',cd:8,when:()=>S.com&&S.rep>=30,run(){mod({heat:25,rep:-6});say('Someone you trusted screenshotted your chat history and sent it to investigators.','c');}},
+ {id:'drama',once:1,when:()=>S.com,run(){Q('Group chat','Two members want you to pick a side','Both are loud. Both are watching.',[
+   o('Back the first',()=>{mod({rep:4,happy:-2,crew:2});say('You backed the first. The other one remembers.','n');},'+Rep|-Makes an enemy'),
+   o('Back the second',()=>{mod({rep:4,happy:-2,crew:2});say('You backed the second. The first one remembers.','n');},'+Rep|-Makes an enemy'),
+   o('Stay out of it',()=>{mod({happy:2});say('You stayed out of it.','g');},'+Peace|~No gain')]);}},
+ {id:'mule',min:18,cd:4,when:()=>S.com,run(){Q('DM','“Run some money through your account”','A friend offers you 10% if you let funds pass through your bank account.',[
+   o('Accept',()=>{crime('scam');const c=ri(1500,6000);mod({cash:c,heat:18,rep:3});say('You moved money for them and kept '+money(c)+'. Your name is on the account.','c');},'+Cash|-Heat|-Guilt|-Your name is on it'),
+   o('Decline',()=>{mod({rep:-2});say('You said no.','g');},'+Stay clean|-Rep'),
+   o('Report it',()=>{mod({heat:-8,rep:-20,crew:-20,guilt:-4});S.legit++;say('You reported the request.','g');},'+Heat down|-Rep|-Crew')]);}},
+ {id:'journalist',once:1,when:()=>S.com&&S.rep>=40,run(){Q('Email','A reporter wants an interview','They are writing about the scene.',[
+   o('Talk on the record',()=>{mod({rep:10,heat:15});say('You gave an interview. It ran with your handle.','c');},'+Rep|-Heat'),
+   o('Talk anonymously',()=>{mod({rep:3,heat:5});say('You talked off the record.','n');},'+Some rep|~Some heat'),
+   o('Decline',()=>{say('You declined.','n');},'~Nothing happens')]);}},
+ /* law enforcement */
+ {id:'police',cd:4,when:()=>S.com&&S.heat>=35,run(){Q('Phone','A detective calls','“Just want to talk. You are not in trouble.”',[
+   o('Talk to him',()=>{if(chance(.5)){say('You said too much.','c');immediateRaid();}else{mod({heat:-5});say('The call went nowhere.','n');}},'~50/50|-Could trigger a raid'),
+   o('Ask for a lawyer',()=>{mod({heat:-5});say('You said you wanted a lawyer and hung up.','n');},'+Heat down|+Smart'),
+   o('Hang up and delete accounts',()=>{mod({heat:5,rep:-10,crew:-10});say('You deleted everything.','c');},'-Rep|-Crew|-Looks guilty')],{timer:7,def:0});}},
+ {id:'traffic',min:16,once:1,when:()=>S.com&&S.heat>=40,run(){Q('Road','You get pulled over','Your phone is buzzing with messages from the crew.',[
+   o('Stay polite and say nothing',()=>{mod({heat:-3});say('He gave you a warning and let you go.','n');},'+Safe'),
+   o('Refuse to hand over your phone',()=>{mod({heat:5});say('He did not like it, but he could not make you.','n');},'~Tense|-Heat'),
+   o('Comply fully',()=>{mod({heat:20});say('He read more than you wanted him to.','c');if(chance(.4))immediateRaid();},'-Heat|-Could trigger a raid')],{timer:6,def:2});}},
+ {id:'informant',cd:6,when:()=>S.com&&S.heat>=45&&pending()>0,run(){Q('Meeting','A detective offers you a deal','“Give us names before you are charged and we will go easy.”',[
+   o('Take the deal',()=>{S.crimes={dox:0,swat:0,scam:0,crypto:0,ato:0,harm:0};S.heat=0;S.com=false;S.server=false;S.rep=0;S.exTarget=true;S.bond.crew=0;mod({happy:-6,guilt:-10});say('You gave names and walked away without charges. Your old crew will find out.','b');},'+No charges|-Lose everything in the scene|-Enemies'),
+   o('Refuse',()=>{mod({heat:6});say('You refused. They said they would be in touch.','c');},'+Loyal|-Heat')]);}},
+ /* money */
+ {id:'callcenter',min:18,max:32,once:1,run(){Q('Job listing','“Customer retention. No experience. $30/hr.”','The listing is vague and the interview was a voice memo.',[
+   o('Apply',()=>{crime('scam');const c=ri(4000,12000);mod({cash:c,heat:12,rep:3});say('The “retention team” was a scam call center. You made '+money(c)+' before it shut down.','c');followUp('scam');},'+Cash|-Heat|-Guilt|-Real victims'),
+   o('Report the listing',()=>{S.legit++;mod({happy:3,guilt:-3});say('You reported it. The listing disappeared.','g');},'+Happy|-Guilt'),
+   o('Ignore it',()=>{},'~Nothing happens')]);}},
+ {id:'tax',min:22,once:1,when:()=>S.cash>40000,run(){Q('Mail','A tax notice about unexplained income','They want to know where your money came from.',[
+   o('Hire an accountant ($3,000)',()=>{mod({cash:-3000,heat:-10});say('The accountant made the problem go quiet.','n');},'-$3,000|+Heat down'),
+   o('Ignore it',()=>{mod({heat:15});say('You ignored it. A second letter came.','c');},'+Keep cash|-Heat'),
+   o('Pay the penalty ($6,000)',()=>{mod({cash:-6000,heat:-5});say('You paid up.','n');},'-$6,000|+Heat down')]);}},
+ {id:'flex',min:18,cd:5,when:()=>S.cash>=15000,run(){Q('Shopping','You could buy something flashy','You have the cash.',[
+   o('Buy a $12,000 watch',()=>{mod({cash:-12000,happy:8,heat:8,rep:S.com?4:0});say('You bought a watch that everyone noticed.','n');},'+Happy|-$12,000|-Heat'),
+   o('Save it',()=>{mod({happy:1});say('You saved the money.','g');},'+Smart|~Boring')]);}},
+ {id:'bankFlag',once:1,when:()=>S.cash>30000&&S.heat>25,run(){Q('Bank','Your account is frozen for review','They need documents showing where the money came from.',[
+   o('Hire a lawyer ($5,000)',()=>{mod({cash:-5000,heat:-5});say('Your lawyer got the account released.','n');},'-$5,000|+Account back'),
+   o('Wait it out',()=>{mod({cash:-Math.round(S.cash*.3),heat:8});say('Eventually they released most of it. You lost 30%.','b');},'-30% of cash|-Heat'),
+   o('Walk away from the account',()=>{mod({cash:-Math.round(S.cash*.5)});say('You walked away from half of it.','b');},'-50% of cash|+No paper trail')]);}},
+ {id:'jobOffer',min:18,cd:4,when:()=>!S.job&&!S.jail,run(){Q('Friend','A friend offers you a real job','It is boring and pays little.',[
+   o('Take it',()=>{S.job=pick(JOBS);mod({happy:3,friends:3});say('You started as a '+S.job.n+'.','g');},'+Steady pay|-Boring'),
+   o('Pass',()=>{say('You passed.','n');},'~Nothing happens')]);}},
+ {id:'loan',min:20,cd:6,run(){Q('Family','Your cousin asks for $2,000','They are behind on rent.',[
+   o('Give it',()=>{mod({cash:-2000,happy:5,family:6});say('You covered their rent.','g');},'-$2,000|+Happy|+Family'),
+   o('Refuse',()=>{mod({happy:-3,family:-5});say('You said no. It got awkward.','n');},'+Keep cash|-Family')]);}},
+ {id:'lottery',min:18,cd:5,run(){Q('Luck','A lottery ticket','The line at the gas station is long and the jackpot is huge.',[
+   o('Buy one ($20)',()=>{mod({cash:-20});if(chance(.04)){const w=ri(5000,25000);mod({cash:w,happy:12});say('You won '+money(w)+'.','g');confetti(90);}else{mod({happy:1});say('Not a winner. Fun while it lasted.','n');}},'-$20|~4% jackpot'),
+   o('Skip it',()=>{},'~Nothing happens')]);}},
+ {id:'flu',min:10,cd:5,run(){Q('Health','You catch a bad flu','You feel awful.',[
+   o('Rest at home',()=>{mod({health:-2,happy:2,cash:S.job?-200:0});say('You rested and recovered.','g');},'+Recover|-Lost pay'),
+   o('Push through it',()=>{mod({health:-9,happy:-4});say('You pushed through and felt worse for it.','b');},'+Keep going|-Health|-Happy')]);}},
+ {id:'promo',min:20,cd:4,when:()=>S.job&&!S.jail,run(){Q('Work','Your boss offers a promotion','More money, longer hours.',[
+   o('Accept',()=>{if(S.job){S.job.p=Math.round(S.job.p*1.15);}mod({happy:-3,health:-2,smarts:2});say('You took the promotion. Your pay went up 15%.','g');},'+15% pay|-Happy|-Health'),
+   o('Decline',()=>{mod({happy:2});say('You kept your hours.','n');},'+Happy|-Same pay')]);}},
+ {id:'wedding',min:20,cd:6,run(){Q('Friend','A friend invites you to their wedding','The invite says no gifts. That means gifts.',[
+   o('Go and bring a gift ($200)',()=>{mod({cash:-200,happy:6,friends:7});say('You danced badly and had a great time.','g');},'-$200|+Happy|+Friends'),
+   o('Skip it',()=>{mod({friends:-6});say('You sent a text instead.','n');},'+Keep cash|-Friends')]);}},
+ {id:'parentsFind',min:12,max:21,once:1,when:()=>S.com&&S.heat>=15,run(){Q('Home','Your mom saw your screen','She read part of your messages and she is not smiling.',[
+   o('Lie',()=>{if(chance(.5)){mod({happy:1});say('She believed you. For now.','n');}else{mod({family:-12,happy:-6});say('She did not believe you. Dinner was silent.','b');}},'~50/50|-Family if it fails'),
+   o('Tell the truth',()=>{mod({family:-8,guilt:-6,happy:-4,heat:-5});say('You told her some of it. She cried.','b');},'-Guilt|-Family|-Happy'),
+   o('Storm out',()=>{mod({family:-14,happy:-3});say('You slammed the door. It stayed quiet for days.','b');},'-Family|-Calm')]);}},
+ {id:'conscience',min:14,cd:6,when:()=>S.guilt>=70,run(){Q('Night','You cannot sleep','You keep thinking about the people on the other end.',[
+   o('Quit the Com for good',()=>{S.com=false;S.server=false;S.bond.crew=0;S.rep=Math.floor(S.rep/2);S.legit++;S.exTarget=true;mod({guilt:-30,happy:6,heat:-12});say('You deleted the servers and left. It felt like breathing again.','g');unlock('redeem');},'-Guilt|+Happy|-Rep|-Crew'),
+   o('Turn yourself in',()=>{unlock('confess');if(pending()){sentence(.5,'You walked in and told them everything.',-15);S.com=false;mod({guilt:-35});}else{mod({guilt:-20,happy:3});say('There was nothing recent to confess. They took your statement anyway.','g');}},'-Guilt|+Shorter sentence|-Freedom'),
+   o('Push it down',()=>{mod({happy:-8,guilt:-5});say('You pushed it down. It came back at night.','b');},'-Happy|~Guilt barely moves')]);}},
+ {id:'relationship',min:18,max:50,once:1,when:()=>S.partner&&S.cash>20000&&crimesEver()>0,run(){const pn=S.partner.n;Q('Partner',pn+' asks where your money comes from','They have noticed the new things and the new accounts.',[
+   o('Lie',()=>{if(chance(.5)){mod({happy:2});say('They believed you. For now.','n');}else{mod({happy:-12});say(pn+' found out. They left.','b');S.partner=null;S.married=false;S.bond.partner=0;}},'~50/50|-They may leave'),
+   o('Tell the truth',()=>{mod({happy:-10,guilt:-8});if(chance(.5))say('They stayed, but nothing is the same.','b');else{say('They left.','b');S.partner=null;S.married=false;S.bond.partner=0;}},'-Guilt|-They may leave'),
+   o('Promise to stop',()=>{S.legit++;mod({happy:5,heat:-10,guilt:-6,partner:6});say('You promised to stop. You meant it.','g');},'+Happy|+Partner|-Guilt|~You have to mean it')]);}},
+ {id:'therapist',min:16,once:1,when:()=>S.tot.swat+S.tot.harm+S.tot.dox>0,run(){Q('Therapy','Your therapist suggests an apology letter','Not to send. Just to write.',[
+   o('Write it',()=>{S.legit++;mod({happy:8,guilt:-12});say('You wrote the letter and cried for an hour.','g');},'+Happy|-Guilt'),
+   o('Refuse',()=>{mod({happy:-3});say('You refused.','n');},'~Nothing changes|-Happy')]);}},
+ {id:'letter',min:20,once:1,when:()=>S.tot.dox+S.tot.swat>0,run(){Q('Mail','A letter from someone you targeted','They did not use your name. They used your handle.',[
+   o('Read it',()=>{mod({happy:-10,guilt:10});say('You read it twice.','b');Q('Decision','Do you stop?','The scene feels different after that letter.',[
+     o('Quit the Com for good',()=>{S.com=false;S.server=false;S.bond.crew=0;S.rep=Math.floor(S.rep/2);S.legit++;mod({heat:-15,happy:6,guilt:-20});say('You deleted the servers and left.','g');unlock('redeem');},'-Guilt|+Happy|-Rep|-Crew'),
+     o('Keep going',()=>{mod({happy:-4});say('You kept going.','b');},'~Nothing changes|-Happy')]);},'-Guilt grows|-Happy'),
+   o('Burn it',()=>{mod({happy:-3});say('You burned the letter.','n');},'~Look away|-Happy')]);}},
+ {id:'granny',min:20,once:1,when:()=>S.tot.scam>0,run(){Q('Family','Your grandmother got a strange call','She tells you someone claiming to be from her bank wanted to verify her account. She almost went along.',[
+   o('Tell her it is a scam and help her',()=>{mod({happy:3,family:5,guilt:-3});say('You walked her through it. She hugged you hard.','g');},'+Family|+Happy|-Guilt'),
+   o('Laugh it off',()=>{mod({happy:-6,family:-6,guilt:5});say('She lost $900 to someone else\'s crew. You knew exactly how it worked.','b');},'-Happy|-Family|-Guilt')]);}},
+ /* jail */
+ {id:'jailfight',jail:1,cd:3,run(){Q('Event','A fight breaks out','A shouting match two cells down turns physical, and people are looking at you.',[
+   o('Stay out of it',()=>{mod({happy:-3});say('You kept your head down.','n');},'+Safe|-Happy'),
+   o('Step in',()=>{mod({health:-12});if(chance(.4)&&S.jail){S.jail.yrs+=1;say('You were written up. A year was added.','b');}else say('You got hurt, but it passed.','b');},'-Health|~Might add a year')]);}},
+ {id:'cellmate',jail:1,cd:3,run(){Q('Event','Your cellmate was in the scene','He knows your handle.',[
+   o('Talk to him',()=>{mod({rep:5,happy:3});say('You swapped stories.','n');},'+Rep|+Happy'),
+   o('Avoid him',()=>{mod({happy:-1});say('You kept your distance.','g');},'+Safe|-Lonely')]);}},
+ {id:'visitor',jail:1,cd:3,when:()=>S.bond.family>=30,run(){mod({happy:5,family:4});say('Your family visited. Nobody mentioned the case.','g');}},
+ {id:'parole',jail:1,once:1,when:()=>S.jail&&S.jail.yrs<=2,run(){Q('Hearing','Parole board','They want to hear why you should go home early.',[
+   o('Show real remorse',()=>{if(chance(.7)&&S.jail){S.jail.yrs=Math.max(.5,S.jail.yrs-.5);mod({guilt:-10});say('The board cut your sentence.','g');}else say('The board did not buy it.','b');},'~70/30|+Shorter sentence'),
+   o('Stay stoic',()=>{say('They noted your silence and moved on.','n');},'~Nothing happens')]);}}
+];
+function drawEvents(){
+  let elig=E.filter(e=>{
+    if(!!e.jail!==!!S.jail)return false;
+    if(e.min&&S.age<e.min)return false;
+    if(e.max&&S.age>e.max)return false;
+    if(e.once&&S.seen[e.id])return false;
+    if(S.cool[e.id]&&S.age<S.cool[e.id])return false;
+    if(e.when&&!e.when())return false;
+    return true;
+  });
+  const n=chance(.92)?(chance(.4)?2:1):0;
+  for(let i=0;i<n&&elig.length;i++){
+    let tot=0;elig.forEach(e=>{tot+=e.w||1;});
+    let r=Math.random()*tot,e=elig[0];
+    for(let j=0;j<elig.length;j++){r-=elig[j].w||1;if(r<=0){e=elig[j];break;}}
+    S.seen[e.id]=1;if(e.cd)S.cool[e.id]=S.age+e.cd;
+    elig=elig.filter(x=>x!==e);
+    e.run();
+  }
+}
+
+/* ================= actions ================= */
+const A=[
+ {id:'discord',tab:'online',ic:'🎮',label:'Join a gaming Discord',fx:'+Happy|+Friends|~Where it all starts',min:11,hide:()=>S.discord,run(){S.discord=true;mod({happy:5,friends:4});say('You joined a gaming server. The voice channels never close.','g');}},
+ {id:'voice',tab:'online',ic:'🎧',label:'Hang in voice chat',fx:'+Happy|+Friends|-Sleep',need:'discord',run(){mod({happy:ri(2,6),friends:2,health:-1});say(pick(VOICE),'n');}},
+ {id:'prank',tab:'online',ic:'📞',label:'Prank call a stranger',fx:'+Happy|-Heat|-Guilt',min:12,need:'discord',run(){mod({happy:3,rep:S.com?1:0,heat:2,guilt:2});say('You made a prank call. It was dumb and a little mean.','n');}},
+ {id:'findcom',tab:'online',ic:'🕳️',label:'Look for the Com',fx:'~Opens private servers|-Slippery slope',min:13,need:'discord',hide:()=>S.com,run(){if(chance(.65))comInvite();else say('You hinted around. Nobody answered.','n');}},
+ {id:'dox',tab:'online',ic:'🪪',label:'Dox someone',fx:'+Rep|-Heat|-Guilt|-A real person pays',min:13,need:'com',hot:true,risk:2,run(){pickTarget('Who do you dox?',DOXT,t=>doDox(t),'dox');}},
+ {id:'giveaway',tab:'online',ic:'🎁',label:'Run a fake giveaway',fx:'+Small cash|-Heat|-Guilt',min:15,need:'com',hot:true,risk:1,run(){scamCall({p:.6,lo:150,hi:1500,heat:6,ok:'Your fake giveaway pulled people in.',fail:'Your giveaway was reported and the account was banned.'});}},
+ {id:'swat',tab:'online',ic:'🚨',label:'Swat someone',fx:'+Huge rep|-Huge heat|-People get hurt',min:15,need:'com',rep:10,hot:true,risk:3,run(){pickTarget('Who do you swat?',SWATT,t=>doSwat(t),'swat');}},
+ {id:'scam',tab:'online',ic:'☎️',label:'Run a scam call',fx:'+Cash|-Heat|-Guilt|-A victim loses money',min:16,need:'com',hot:true,risk:2,run(){scamCall({p:.55,lo:300,hi:3000,heat:8,ok:'You ran a scam call.',fail:'They hung up and reported the number.'});}},
+ {id:'techsupport',tab:'online',ic:'🖥️',label:'Run a tech-support scam',fx:'+Mid cash|-Heat|-Guilt',min:16,need:'com',hot:true,risk:2,run(){scamCall({p:.5,lo:500,hi:4000,heat:10,ok:'You posed as tech support.',fail:'The target did not buy it.'});}},
+ {id:'bankalert',tab:'online',ic:'🏦',label:'Run a fake bank-alert call',fx:'+Mid cash|-Heat|-Guilt',min:17,need:'com',hot:true,risk:2,run(){scamCall({p:.5,lo:800,hi:6000,heat:12,ok:'You posed as a bank fraud team.',fail:'The target called the bank back.'});}},
+ {id:'crypto',tab:'online',ic:'🪙',label:'Call as exchange support',fx:'+Big cash|-Big heat|-Ruins people',min:17,need:'com',rep:15,hot:true,risk:3,run(){callGame();}},
+ {id:'invoice',tab:'online',ic:'🧾',label:'Send fake invoices to small businesses',fx:'+Steady cash|-Steady heat|-Guilt',min:20,need:'com',hot:true,risk:3,run(){scamCall({p:.5,lo:2000,hi:12000,heat:14,ok:'Your fake invoices got paid.',fail:'A bookkeeper caught it.'});}},
+ {id:'ato',tab:'online',ic:'🔓',label:'Join an account takeover ring',fx:'+Serious money|-Federal heat|-Real victims',min:20,need:'com',rep:40,hot:true,risk:4,run(){
+   if(chance(.55)){crime('ato');const c=ri(6000,60000);mod({cash:c,rep:10,heat:28,crew:4});say('Your ring took over accounts and cashed out '+money(c)+'. Every account belonged to a person.','c');}
+   else{mod({heat:15,rep:-3});say('The ring stalled. Someone got sloppy.','b');}}},
+ {id:'server',tab:'online',ic:'🏰',label:'Start your own server',fx:'+Passive rep|-Passive heat|-$500',min:21,need:'com',rep:50,hide:()=>S.server,lk:()=>S.cash<500?'Needs $500':'',run(){S.server=true;mod({rep:10,cash:-500});say('You built your own server. People know your name now.','c');}},
+ {id:'laylow',tab:'online',ic:'🌙',label:'Go quiet online',fx:'+Less heat|-Rep|-Crew',need:'com',run(){mod({heat:-20,rep:-4,crew:-3});say('You stopped posting for a while.','n');}},
+ {id:'favor',tab:'online',ic:'🤝',label:'Call in a favor',fx:'+Less heat|-$500|-Crew',need:'com',rep:20,lk:()=>S.cash<500?'Needs $500':'',run(){mod({cash:-500,heat:-25,crew:-12});say('Someone in the crew scrubbed a few threads for you. You owe them now.','n');}},
+ {id:'confess',tab:'online',ic:'🗣️',label:'Turn yourself in',fx:'-Guilt|+Shorter sentence|-Freedom',hide:()=>!pending(),run(){unlock('confess');sentence(.55,'You walked into a station and gave a full statement.',-15);S.com=false;mod({guilt:-30,crew:-30});}},
+ {id:'leave',tab:'online',ic:'🚪',label:'Leave the Com',fx:'+Less heat|+Happy|-Rep|-Old friends may not forgive it',need:'com',run(){S.com=false;S.server=false;S.exTarget=true;S.bond.crew=0;S.rep=Math.floor(S.rep*.4);mod({heat:-10,happy:8,guilt:-10});say('You left the Com. Some people will not forget it.','g');unlock('redeem');}},
+
+ {id:'study',tab:'life',ic:'📚',label:'Study',fx:'+Smarts|-Happy',min:5,run(){mod({smarts:ri(3,7),happy:-1});say('You hit the books.','g');}},
+ {id:'gym',tab:'life',ic:'🏋️',label:'Go to the gym',fx:'+Health|+Happy|-$40',min:12,run(){mod({health:ri(3,7),happy:2,cash:S.age>=18?-40:0});say('You trained.','g');}},
+ {id:'coding',tab:'life',ic:'💻',label:'Learn to code',fx:'+Smarts|-Free time',min:12,run(){mod({smarts:ri(4,9),happy:-1,friends:-1});say('You built a small project.','g');}},
+ {id:'therapy',tab:'life',ic:'🛋️',label:'See a therapist',fx:'+Happy|-Guilt|-$150',min:10,run(){mod({cash:S.age>=18?-150:0,happy:ri(5,10),guilt:-12});say('Talking helped more than you expected.','g');}},
+ {id:'doctor',tab:'life',ic:'🩺',label:'See a doctor',fx:'+Health|-$300',min:5,run(){mod({cash:S.age>=18?-300:0,health:ri(5,12)});say('Checkup done.','g');}},
+ {id:'volunteer',tab:'life',ic:'🧡',label:'Volunteer',fx:'+Happy|-Guilt|+Friends|-Free time',min:14,run(){mod({happy:5,guilt:-6,friends:3,family:2});say('You spent a weekend helping people. It was tiring in a good way.','g');}},
+ {id:'job',tab:'life',ic:'💼',label:'Get a job',fx:'+Steady pay|-Free time',min:16,hide:()=>!!S.job,run(){
+   if(chance(clamp(.85-.35*S.record-(S.age<18?.2:0),.1,.95))){S.job=pick(JOBS);say('You got a job as a '+S.job.n+'.','g');mod({happy:3});}
+   else say(S.record?'Your background check scared every employer off.':'Nobody called you back.','b');}},
+ {id:'overtime',tab:'life',ic:'⏱️',label:'Work overtime',fx:'+Cash|-Health|-Happy',min:16,hide:()=>!S.job,run(){const c=ri(1500,4000);mod({cash:c,health:-4,happy:-4});say('You picked up extra shifts and earned '+money(c)+'.','n');}},
+ {id:'raise',tab:'life',ic:'📈',label:'Ask for a raise',fx:'~50/50|+Pay|-Awkward',min:18,hide:()=>!S.job,run(){if(chance(.45)){S.job.p=Math.round(S.job.p*1.1);mod({happy:5});say('Your boss agreed. A 10% raise.','g');}else{mod({happy:-4});say('Your boss said “not right now.”','b');}}},
+ {id:'freelance',tab:'life',ic:'🧑‍💻',label:'Freelance side hustle',fx:'+Cash|+Smarts|-Happy',min:16,lk:()=>S.smarts<40?'Smarts 40+':'',run(){const c=ri(500,3500);mod({cash:c,smarts:2,happy:-2});S.legit++;say('You finished a few freelance gigs and earned '+money(c)+'.','g');}},
+ {id:'quit',tab:'life',ic:'🚪',label:'Quit your job',fx:'+Happy|-Income',min:16,hide:()=>!S.job,run(){mod({happy:4});say('You quit your job as a '+S.job.n+'.','n');S.job=null;}},
+ {id:'college',tab:'life',ic:'🎓',label:'Apply to college',fx:'+Smarts|+Better pay|-$15,000 loans',min:18,hide:()=>S.college||S.age>25,run(){
+   if(chance(S.smarts/100+.2)){S.college=true;mod({cash:-15000,smarts:10,happy:4});say('You got into college. The loans came with it.','g');unlock('diploma');confetti(60);}
+   else{mod({happy:-4});say('You were rejected.','b');}}},
+ {id:'bounty',tab:'life',ic:'🐞',label:'Hunt bug bounties',fx:'+Cash|-Guilt|-Heat|~Mini-game',min:16,lk:()=>S.smarts<45?'Smarts 45+':'',run(){bounty();}},
+
+ {id:'callfam',tab:'people',ic:'📞',label:'Call your family',fx:'+Family|+Happy',min:5,run(){S.did.fam=true;mod({family:ri(5,10),happy:ri(1,4)});say('You called home. It was good to hear a familiar voice.','g');}},
+ {id:'dinner',tab:'people',ic:'🍝',label:'Family dinner',fx:'+Family|+Happy|-$80',min:8,run(){S.did.fam=true;mod({family:ri(6,12),happy:ri(3,6),cash:S.age>=18?-80:0});say('Everyone showed up. Nobody looked at their phone for once.','g');}},
+ {id:'friendsIn',tab:'people',ic:'🍕',label:'Hang out with friends in person',fx:'+Friends|+Happy|-$60',min:8,run(){S.did.fri=true;mod({friends:ri(5,10),happy:ri(4,9),cash:S.age>=18?-60:0});say('You spent time with people you can actually see.','g');}},
+ {id:'date',tab:'people',ic:'🌹',label:'Go on a date',fx:'~Might meet someone|-$120',min:16,hide:()=>!!S.partner,run(){
+   if(S.age>=18)mod({cash:-120});
+   if(chance(.55)){S.partner={n:pick(PARTNERS)};S.bond.partner=50;mod({happy:10});say('You met '+S.partner.n+'. It went better than you expected.','g');}
+   else{mod({happy:-3});say('The date was awkward. You split the bill and left.','n');}}},
+ {id:'datenight',tab:'people',ic:'🕯️',label:'Date night',fx:'+Partner|+Happy|-$150',need:'partner',run(){S.did.par=true;mod({partner:ri(6,12),happy:ri(3,7),cash:S.age>=18?-150:0});say('A good night with '+S.partner.n+'.','g');}},
+ {id:'propose',tab:'people',ic:'💍',label:'Propose',fx:'+Marriage|+Happy|-$3,000 ring|~Might say no',min:21,need:'partner',hide:()=>S.married,lk:()=>S.bond.partner<60?'Bond 60+':(S.cash<3000?'Needs $3,000':''),run(){
+   mod({cash:-3000});
+   if(chance(S.bond.partner/110)){S.married=true;mod({happy:15,partner:10});say(S.partner.n+' said yes. You got married.','g');unlock('married');confetti(120);}
+   else{mod({happy:-10,partner:-12});say(S.partner.n+' said not yet. The ring is still in your pocket.','b');}}},
+ {id:'breakup',tab:'people',ic:'💔',label:'Break up',fx:'+Freedom|-Happy',need:'partner',run(){mod({happy:-8});say('You and '+S.partner.n+' ended things.','b');S.partner=null;S.married=false;S.bond.partner=0;}},
+ {id:'apologize',tab:'people',ic:'🕊️',label:'Apologize to someone you targeted',fx:'-Guilt|+Happy|-Rep',need:'crime',run(){mod({guilt:-14,happy:4,rep:S.com?-4:0});say('You wrote a message that did not ask for forgiveness. You just said sorry.','g');}},
+
+ {id:'pc',tab:'shop',ic:'🖥️',label:'Buy a gaming PC',fx:'+Happy|-$2,500',min:10,lk:()=>S.cash<2500?'Needs $2,500':'',run(){mod({cash:-2500,happy:6});say('You bought a gaming PC.','g');}},
+ {id:'car',tab:'shop',ic:'🚗',label:'Buy a used car',fx:'+Happy|+Freedom|-$9,000',min:16,lk:()=>S.cash<9000?'Needs $9,000':'',run(){mod({cash:-9000,happy:8});say('You bought a used car.','g');}},
+ {id:'watch',tab:'shop',ic:'⌚',label:'Buy a luxury watch',fx:'+Happy|-Heat|-$12,000',min:18,lk:()=>S.cash<12000?'Needs $12,000':'',run(){mod({cash:-12000,happy:8,heat:8,rep:S.com?4:0});say('You bought a watch. People noticed.','n');}},
+ {id:'vacation',tab:'shop',ic:'🏝️',label:'Take a vacation',fx:'+Happy|+Less heat|-$4,000',min:18,lk:()=>S.cash<4000?'Needs $4,000':'',run(){mod({cash:-4000,happy:12,heat:-5,health:3});say('You took a trip and turned off your phone.','g');}},
+ {id:'donate',tab:'shop',ic:'💝',label:'Donate to charity',fx:'+Happy|-Guilt|-$500',min:14,lk:()=>S.cash<500?'Needs $500':'',run(){mod({cash:-500,happy:5,guilt:-8});say('You donated $500.','g');}},
+ {id:'retainer',tab:'shop',ic:'⚖️',label:'Put a lawyer on retainer',fx:'+Covers your next case|-$8,000',min:18,hide:()=>S.retainer,lk:()=>S.cash<8000?'Needs $8,000':'',run(){mod({cash:-8000});S.retainer=true;say('You put a lawyer on retainer.','n');}},
+
+ {id:'read',tab:'lockup',ic:'📖',label:'Read in the library',fx:'+Smarts',run(){mod({smarts:ri(3,6)});say('You read all week.','g');}},
+ {id:'work',tab:'lockup',ic:'🏃',label:'Work out in the yard',fx:'+Health|-Rough crowd',run(){mod({health:ri(3,6)});say('You trained in the yard.','g');}},
+ {id:'quiet',tab:'lockup',ic:'🤫',label:'Keep your head down',fx:'+Happy|+Safe',run(){mod({happy:ri(2,5)});say('You stayed out of trouble.','n');}},
+ {id:'writehome',tab:'lockup',ic:'✉️',label:'Write home',fx:'+Family|+Happy',run(){mod({family:ri(4,9),happy:3});say('You wrote a letter home. It took three drafts.','g');}},
+ {id:'prisonjob',tab:'lockup',ic:'🧰',label:'Take a prison job',fx:'+Small cash|-Happy',run(){mod({cash:ri(100,400),happy:-2});say('You worked a shift in the laundry for pocket change.','n');}},
+ {id:'ged',tab:'lockup',ic:'📝',label:'Study for your GED',fx:'+Smarts|+Happy',hide:()=>S.ged,run(){S.ged=true;mod({smarts:8,happy:4});say('You earned your GED.','g');}},
+ {id:'appeal',tab:'lockup',ic:'📜',label:'File an appeal',fx:'~30% to cut a year|-$0 but hope',run(){if(chance(.3)&&S.jail){S.jail.yrs=Math.max(.5,S.jail.yrs-1);mod({happy:5});say('Your appeal worked. A year came off.','g');}else{mod({happy:-3});say('Your appeal was denied.','b');}}},
+ {id:'snitch',tab:'lockup',ic:'🐀',label:'Talk to investigators',fx:'+Shorter sentence|-Rep|-Crew',run(){if(S.jail)S.jail.yrs=Math.max(.5,S.jail.yrs-1);mod({rep:-20,happy:-4,crew:-20});say('You gave names. A year came off.','n');}}
+];
+function lock(a){
+  if(a.min&&S.age<a.min)return 'Age '+a.min+'+';
+  if(a.need==='discord'&&!S.discord)return 'Join a Discord first';
+  if(a.need==='com'&&!S.com)return 'Needs the Com';
+  if(a.need==='partner'&&!S.partner)return 'Needs a partner';
+  if(a.need==='crime'&&!crimesEver())return 'Nothing to apologize for';
+  if(a.rep&&S.rep<a.rep)return 'Rep '+a.rep+'+';
+  if(a.lk){const r=a.lk();if(r)return r;}
+  return '';
+}
+function act(a){
+  if(busy||!S.alive||S.did[a.id]||lock(a))return;
+  S.did[a.id]=true;sfx('click');
+  a.run();
+  render();
+}
+function riskLvl(a){return clamp(Math.round((a.risk||2)+S.heat/45-.5),1,4);}
+const RKL=['','Low risk','Medium risk','High risk','Extreme risk'];
+
+/* ================= aging ================= */
+function scripted(){
+  const t={5:'You started kindergarten.',8:'Your family got a computer.',10:'You got your own laptop.',11:'Everyone at school is on Discord now.',13:'Servers start inviting you into private channels.',14:'High school started.',16:'Some people in the servers are already making money.',18:'You graduated. Rent and bills now have your real name on them.',21:'You can legally drink. Nobody in the server cares about that.',30:'Your online friends are mostly strangers who know your old handle.',40:'Midlife. Your knees file a complaint.'};
+  if(t[S.age])say(t[S.age],'n');
+  if(S.age===65&&S.job){say('You retired from your job as a '+S.job.n+'.','n');S.job=null;}
+}
+function ageUp(){
+  if(busy||!S.alive)return;
+  sfx('age');
+  const prev={fam:S.did.fam,fri:S.did.fri,par:S.did.par,crime:S.crimeYr};
+  S.age++;S.did={};S.crimeYr=false;D=[];
+  const av=$('#ava');av.classList.remove('bump');void av.offsetWidth;av.classList.add('bump');
+  let decl=S.age<35?(chance(.15)?ri(1,3):0):ri(1,2)+Math.floor((S.age-35)/15);
+  S.health=clamp(S.health-decl);
+  if(S.happy<=5)S.health=clamp(S.health-3);
+  if(S.jail){
+    S.inside++;S.jail.yrs-=1;
+    say(pick(JAIL_LINES),'n');mod({happy:-ri(1,5),health:-ri(0,2)});
+    drawEvents();
+    if(S.jail&&S.jail.yrs<=0){
+      S.jail=null;S.heat=10;S.rep=Math.floor(S.rep/2);ui.tab='online';
+      say('You were released at '+S.age+'. The conviction came with you.','b');
+    }
+  }else{
+    scripted();
+    const f=FLAVOR.filter(e=>S.age>=e[0]&&S.age<=e[1]);
+    if(f.length&&chance(.3)){const e=pick(f);mod(e[3]);say(e[2],e[4]);}
+    if(S.age>=8&&S.age<18)mod({cash:ri(100,400)});
+    drawEvents();
+    /* relationships drift if ignored */
+    if(S.age>=6&&!prev.fam)S.bond.family=clamp(S.bond.family-2);
+    if(S.age>=8&&!prev.fri)S.bond.friends=clamp(S.bond.friends-2);
+    if(S.partner&&!prev.par)S.bond.partner=clamp(S.bond.partner-4);
+    if(S.com)S.bond.crew=clamp(S.bond.crew-2);
+    if(S.age>=10&&S.bond.family<20&&chance(.5)){mod({happy:-3});say('You and your family barely talk anymore.','b');}
+    if(S.age>=10&&S.bond.friends<15&&chance(.4)){mod({happy:-3});say('Your friends stopped texting. It stings.','b');}
+    if(S.partner&&S.bond.partner<=8){say(S.partner.n+' left. You had stopped making time.','b');mod({happy:-10});S.partner=null;S.married=false;S.bond.partner=0;}
+    if(S.partner&&S.married&&S.bond.partner>40)mod({happy:2});
+    if(S.com&&S.bond.crew<10&&chance(.2)){mod({heat:20,rep:-6});say('Your crew stopped covering for you. Someone talked.','c');}
+    if(S.exTarget&&chance(.4)){S.exTarget=false;mod({heat:10,happy:-5});say('Someone you left behind leaked old messages.','c');}
+    if(S.age>=18){
+      mod({cash:-16000});
+      if(S.age<23&&S.bond.family>=40&&S.college)mod({cash:6000});
+      if(S.job){mod({cash:S.job.p+(S.college?8000:0)});
+        if(chance(.08)){S.job.p=Math.round(S.job.p*1.08);say('You got a small raise at work.','g');}
+        else if(chance(.04)){say('You were laid off from your job as a '+S.job.n+'.','b');S.job=null;mod({happy:-8});}}
+      if(S.cash<-15000)mod({happy:-4});
+    }
+    if(S.server)mod({rep:3,heat:6});
+    S.heat=clamp(S.heat-8);
+    if(!prev.crime&&S.guilt>0)S.guilt=clamp(S.guilt-3);
+    if(S.guilt>=60){mod({happy:-4});if(chance(.5))say('You still think about the people you hurt.','b');}
+    investigate();
+  }
+  const dead=S.health<=0||(S.age>68&&chance((S.age-68)*.02))||S.age>=105;
+  if(dead)die(S.jail?'in custody':(S.health<=0?'of ill health':'of natural causes'));
+  render();
+}
+function die(cause){
+  S.alive=false;S.ended=cause;
+  M.lives++;M.best=Math.max(M.best,S.age);saveMeta();
+  const c=S.tot,v=c.dox+c.swat+c.scam+c.crypto+c.ato;
+  let title,txt;
+  if(S.legit>=3&&S.inside<2){title='The Long Way Around';txt='You turned the same skills toward honest work.';}
+  else if(S.inside>=10){title='A Long Sentence';txt='Most of your adult life was spent inside.';}
+  else if(S.inside>0){title='Doing the Time';txt='Prison and a record shaped what came after.';}
+  else if(v>0){title='Never Caught';txt='No one caught you. The people you targeted are still out there.';}
+  else{title='An Ordinary Life';txt='The Com never got its hooks in you.';}
+  const html='<div class="tomb">🪦</div><div class="sumgrid">'+
+   [[S.age,'Age at death'],[money(S.cash),'Cash'],[v,'People targeted'],[c.harm,'People seriously harmed'],[S.inside+' yrs','Time inside'],[S.peakRep,'Peak rep'],[S.bond.family,'Family bond'],[S.partner?S.partner.n:'None','Partner']]
+   .map(p=>'<div><b>'+esc(p[0])+'</b><span>'+esc(p[1])+'</span></div>').join('')+'</div>';
+  say('You died '+cause+' at '+S.age+'.','s');
+  sfx('death');flash('rgba(0,0,0,.8)');
+  queue({kick:'The end',title:title,text:S.name+' died '+cause+'. '+txt,html:html,opts:[{label:'Start a new life',pri:true,fn:()=>newLife()}]});
+}
+function checkAch(){
+  if(S.job)unlock('first_job');if(S.college)unlock('diploma');if(S.cash>=100000)unlock('rich');
+  if(S.age>=70)unlock('oldtimer');if(S.married)unlock('married');
+  if(S.age>=60&&!S.everCom)unlock('ordinary');
+}
+
+/* ================= render ================= */
+function initBars(){
+  $('#bars').innerHTML=BARS.map(b=>'<div class="bar" data-k="'+b[0]+'" title="'+b[2]+'"><div class="lab"><span>'+b[1]+' '+b[2]+'</span><i></i></div><div class="trk"><div class="fil f-'+b[0]+'"></div></div></div>').join('');
+}
+function avatar(){
+  const a=S.age;let e=a<3?'👶':a<13?'🧒':a<18?'🧑‍🎓':a<60?'🧑':'🧓';
+  if(!S.alive)e='💀';
+  let b=S.happy>70?'😄':S.happy>40?'🙂':S.happy>20?'😞':'😢';
+  if(S.heat>=70)b='😰';if(S.jail)b='🔒';if(!S.alive)b='🪦';
+  $('#avaE').textContent=e;$('#avaB').textContent=b;
+  const av=$('#ava');av.style.setProperty('--p',S.health);
+  av.style.setProperty('--ringc',S.health>60?'#34d399':S.health>30?'#fbbf24':'#fb5a6e');
+}
+function tweenCash(to){
+  const el=$('#cash');const from=ui.cashShown==null?to:ui.cashShown;ui.cashShown=to;
+  el.className='cash'+(to<0?' neg':'');
+  if(from===to||RM){el.textContent=money(to);return;}
+  el.classList.add(to>from?'gain':'loss');
+  setTimeout(()=>el.classList.remove('gain','loss'),700);
+  const t0=Date.now(),dur=650;
+  (function step(){
+    const k=Math.min(1,(Date.now()-t0)/dur),e=1-Math.pow(1-k,3);
+    if(ui.cashShown!==to)return;
+    el.textContent=money(from+(to-from)*e);
+    if(k<1)requestAnimationFrame(step);else el.textContent=money(to);
+  })();
+}
+function flushF(){
+  const list=F.slice(0,8);F=[];
+  list.forEach((x,i)=>{
+    const k=x[0],v=x[1];
+    let target=k==='cash'?$('#cash'):BONDS[k]?$('#ava'):$('.bar[data-k="'+k+'"]');
+    if(!target||!target.getBoundingClientRect)return;
+    const r=target.getBoundingClientRect(),good=INV[k]?v<0:v>0;
+    const d=document.createElement('div');d.className='fl '+(good?'up':'dn');
+    d.textContent=k==='cash'?(v>0?'+':'-')+'$'+Math.abs(v).toLocaleString('en-US'):(v>0?'+':'')+v+(BONDS[k]?' '+LBL[k]:'');
+    d.style.left=Math.max(6,r.left+r.width/2-24)+'px';d.style.top=(r.top-4)+'px';d.style.animationDelay=(i*.12)+'s';
+    document.body.appendChild(d);
+    setTimeout(()=>{try{d.remove()}catch(e){}},1900+i*120);
+  });
+}
+const TABINFO={online:['🌐','online'],life:['🎒','life'],people:['👥','people'],shop:['🛒','shop'],lockup:['⛓️','lockup']};
+function render(){
+  if(!S)return;
+  if(S.jail)ui.tab='lockup';else if(ui.tab==='lockup')ui.tab='online';
+  document.body.classList.toggle('jail',!!S.jail);
+  HEAT=S.heat;
+  const vg=$('#vig');vg.style.opacity=S.heat>35?Math.min(1,(S.heat-35)/55):0;vg.classList.toggle('pulse',S.heat>=75);
+  tweenCash(S.cash);
+  $('#newBtn').textContent=confirmNew?'Sure?':'New life';
+  $('#sndBtn').textContent=muted?'🔇':'🔊';
+  avatar();
+  $('#nm').textContent=S.name;
+  $('#sub').innerHTML='<span class="tag age">Age '+S.age+'</span>'+
+    (S.job?'<span class="tag">'+esc(S.job.n)+'</span>':'')+
+    (S.handle&&S.com?'<span class="tag com">'+esc(S.handle)+'</span>':'')+
+    (S.partner?'<span class="tag love">'+(S.married?'💍 ':'💞 ')+esc(S.partner.n)+'</span>':'')+
+    (S.record?'<span class="tag rec">Record x'+S.record+'</span>':'')+
+    (S.jail?'<span class="tag jail">'+(S.jail.juv?'Juvenile detention':'Prison')+', '+S.jail.yrs+' yr left</span>':'');
+  BARS.forEach(b=>{
+    const el=$('.bar[data-k="'+b[0]+'"]');if(!el)return;
+    const v=S[b[0]];
+    el.querySelector('.fil').style.width=v+'%';el.querySelector('i').textContent=Math.round(v);
+    el.classList.toggle('danger',(b[0]==='happy'&&v<=15)||(b[0]==='health'&&v<=20)||(b[0]==='heat'&&v>=75)||(b[0]==='guilt'&&v>=80));
+  });
+  let h='';
+  S.log.forEach(g=>{
+    h+='<div class="div">Age '+g.age+'</div>';
+    g.lines.forEach(l=>{h+='<div class="ln '+l.c+(l.id>ui.seen?' new':'')+'">'+esc(l.t)+deltaChips(l.d)+'</div>';});
+  });
+  const feed=$('#feed');feed.innerHTML=h;feed.scrollTop=feed.scrollHeight;
+  ui.seen=S.seq;
+  const tabs=S.jail?['lockup']:['online','life','people','shop'];
+  $('#tabs').innerHTML=tabs.map(t=>'<button class="tab" type="button" role="tab" data-tab="'+t+'" aria-selected="'+(ui.tab===t&&ui.open)+'">'+TABINFO[t][0]+' '+TABINFO[t][1]+'</button>').join('');
+  const p=$('#panel');p.hidden=!ui.open;
+  if(ui.open){
+    const items=A.filter(a=>a.tab===ui.tab&&!(a.hide&&a.hide())&&!(a.min&&a.min>S.age+5));
+    p.innerHTML=items.length?'':'<div class="empty">Nothing here yet. Age up.</div>';
+    items.forEach(a=>{
+      const lk=lock(a),done=S.did[a.id];
+      const b=document.createElement('button');b.type='button';b.className='act'+(a.hot?' hot':'');b.disabled=!!(lk||done);
+      let rt=lk?esc(lk):(done?'Done this year':'');
+      if(!lk&&!done&&a.hot){const r=riskLvl(a);rt='<span class="rk rk'+r+'">'+RKL[r]+'</span>';}
+      b.innerHTML='<span class="ic">'+a.ic+'</span><span class="tx"><strong>'+esc(a.label)+'</strong>'+tags(a.fx)+'</span><span class="rt">'+rt+'</span>';
+      b.addEventListener('click',()=>act(a));
+      p.appendChild(b);
+    });
+  }
+  const ab=$('#ageBtn');ab.disabled=busy||!S.alive;
+  ab.innerHTML=(S.jail?'Serve another year':'Age up')+'<small>'+(S.alive?'YEAR '+(S.age+1)+' →':'GAME OVER')+'</small>';
+  try{localStorage.setItem(SAVE,JSON.stringify(S));}catch(e){}
+  flushF();
+  checkAch();
+}
+
+/* ================= boot ================= */
+function intro(){
+  Q('Welcome','A life sim about the Com','You start as a baby and age up one year at a time. Events ask you to reply, and the older you get, the more the scene opens up. Every choice has green upsides and red downsides, and the people on the other end of the bad ones are real. Use the tabs to act on your own.',[{label:'Start life',pri:true}]);
+}
+function newLife(){S=blank();evq=[];busy=false;cur=null;clearInterval(timerH);D=[];F=[];ui={tab:'online',open:true,seen:0,cashShown:0};confirmNew=false;$('#overlay').hidden=true;say('You were born. Your parents named you '+S.name+'.','n');render();intro();}
+function achModal(){
+  const html='<div class="achg">'+ACH.map(a=>'<div class="'+(M.ach[a.id]?'':'lock')+'"><em>'+a.ic+'</em><p style="margin:0"><b>'+esc(a.n)+'</b><span>'+esc(a.d)+'</span></p></div>').join('')+'</div>';
+  if(busy)return;
+  Q('Achievements','Trophies','Unlocked '+Object.keys(M.ach).length+' of '+ACH.length+'. Lives lived: '+M.lives+'. Oldest age: '+M.best+'.',[{label:'Close',pri:true}],{html:html});
+}
+$('#ageBtn').addEventListener('click',ageUp);
+$('#achBtn').addEventListener('click',achModal);
+$('#sndBtn').addEventListener('click',()=>{muted=!muted;try{localStorage.setItem(MUTE,muted?'1':'0')}catch(e){}$('#sndBtn').textContent=muted?'🔇':'🔊';sfx('click');});
+$('#bars').addEventListener('click',e=>{
+  const b=e.target.closest('.bar');if(!b||busy)return;
+  const m={Happy:'How you feel. At zero your health starts dropping.',Health:'At zero you die.',Smarts:'Helps crimes succeed and unlocks legit paths.',Rep:'Clout in the Com. Unlocks bigger crimes.',Heat:'Law-enforcement attention. High heat means raids and arrests.',Guilt:'What the choices cost you inside. High guilt drains your happiness and wakes you at night.'};
+  const k=b.getAttribute('title');Q('Stat',k,m[k]||'',[{label:'OK',pri:true}]);
+});
+$('#tabs').addEventListener('click',e=>{
+  const b=e.target.closest('.tab');if(!b)return;
+  const t=b.getAttribute('data-tab');
+  ui.open=(ui.tab===t&&ui.open)?false:true;ui.tab=t;sfx('click');render();
+});
+$('#newBtn').addEventListener('click',()=>{
+  if(!confirmNew){confirmNew=true;render();setTimeout(()=>{confirmNew=false;render();},3000);}
+  else newLife();
+});
+addEventListener('keydown',e=>{
+  if(!$('#overlay').hidden&&cur){const n=parseInt(e.key,10);if(n>=1&&n<=9)choose(n-1);return;}
+  if($('#title')&&!$('#title').hidden)return;
+  if(e.key==='Enter'&&S&&document.activeElement===document.body)ageUp();
+});
+$('#tNew').addEventListener('click',()=>{$('#title').hidden=true;newLife();});
+$('#tCont').addEventListener('click',()=>{$('#title').hidden=true;render();});
+function boot(){
+  initBars();loadMeta();
+  let loaded=false;
+  try{const raw=localStorage.getItem(SAVE);if(raw){const ld=JSON.parse(raw);if(ld&&ld.name&&ld.log&&ld.crimes&&ld.seen&&ld.bond){S=ld;loaded=true;ui.seen=S.seq||0;}}}catch(e){}
+  $('#tCont').hidden=!(loaded&&S.alive);
+  $('#tStat').textContent=M.lives?('Lives lived: '+M.lives+'   Oldest: '+M.best+'   Trophies: '+Object.keys(M.ach).length+'/'+ACH.length):'';
+  if(!loaded||!S.alive)S=null;
+}
+boot();
+window.__CL={ageUp,choose,newLife,act,A,lock,state:()=>S,busy:()=>busy,cur:()=>cur,render};
+})();
+</script>
+</body></html>
